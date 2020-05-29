@@ -12,7 +12,7 @@ def lambda_handler(event, context):
 def run():
 
     wsb_reddit = WSBReddit()
-    submissions = wsb_reddit.get_submissions()
+    submissions = wsb_reddit.get_submissions(flair_filter=True)
 
     wsb_reddit.process_inbox()
     wsb_reddit.process_submissions(submissions)

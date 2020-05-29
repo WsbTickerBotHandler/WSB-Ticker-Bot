@@ -27,7 +27,7 @@ class WSBReddit:
         self.notify_users(submissions)
 
     def get_submissions(self, flair_filter=False, limit=30) -> [Submission]:
-        valid_flairs = {'DD', 'Fundamentals'}
+        valid_flairs = {'DD', 'Fundamentals', 'Stocks', 'Discussion'}
         if flair_filter:
             return [s for s in self.wsb.rising(limit=limit) if s.link_flair_text in valid_flairs]
         else:
