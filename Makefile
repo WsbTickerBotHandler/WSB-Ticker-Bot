@@ -6,5 +6,5 @@ integration_test:
 create_bucket:
 	sh make_bucket.sh
 
-package_lambda:
-	sh package_lambda.sh
+deploy:
+	sh deploy.sh

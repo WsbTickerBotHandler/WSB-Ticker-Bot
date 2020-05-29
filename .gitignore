@@ -2,6 +2,7 @@
 */__pycache__/
 *.pyc
 package/*
+bucket-name.txt
 src/praw.ini
 praw.ini
 out.yml
