@@ -14,8 +14,8 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
 * The bot runs every 15 minutes so it will take at most that long to be notified of posts in the 15-minute window since you subscribed
 
 ## Need some help
-* Currently, the bot gets rate-limited when making posts, so if you can **upvote its comment** below that would help me out a lot. I'd like to have the bot post on DD-flaired posts with the tickers it finds in them to help other people find it and use it
-* If you find any issues or have a suggestion or feature you'd like to see, send this account a message or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
+* Currently, the bot gets rate-limited when making posts, so if you can **upvote its comments** that would help a lot. I'd like to have the bot post on rising DD-flaired posts with the tickers it finds in them to help other people find it and use it
+* If you find any issues or have a suggestion or feature you'd like to see, send a message to /u/WSBTickerBotHandler or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
 
 ---
 
@@ -26,4 +26,3 @@ If this bot helped your tendies print consider leaving a tip and I swear to piss
 `BCH: qzazpxhgyx8xperazwnt8js2pufckyrv2ya49s9vmf`
 
 If you lost money because you read some shit DD then open up the door to the back porch, head outside, smoke some weed and chill the fuck out. Money isn't everything. Except when you yolo your parent's 100k retirement fund. But hey, maybe if you'd seen the right DD that wouldn't have happened
-
