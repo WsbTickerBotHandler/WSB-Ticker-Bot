@@ -1,6 +1,8 @@
+import logging
 from wsb_reddit import *
 
-logger = getLogger()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event, context):

@@ -4,6 +4,7 @@ import logging
 from praw.models import Redditor, Submission
 
 logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 MAX_TICKERS = 10
 # These will be excluded unless there is a $ before them

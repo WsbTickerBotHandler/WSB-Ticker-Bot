@@ -1,14 +1,13 @@
-import os
-
 from typing import Union
-from logging import getLogger
+import logging
 from database import *
 from wsb_reddit_utils import *
 from praw.reddit import Reddit
 from praw.models import *
 from stock_data.tickers import tickers as tickers_set
 
-logger = getLogger()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 class WSBReddit:
