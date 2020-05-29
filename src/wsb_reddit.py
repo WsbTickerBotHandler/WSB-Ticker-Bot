@@ -28,9 +28,9 @@ class WSBReddit:
     def get_submissions(self, flair_filter=False, limit=30) -> [Submission]:
         valid_flairs = {'DD', 'Fundamentals', 'Stocks', 'Discussion'}
         if flair_filter:
-            return [s for s in self.wsb.rising(limit=limit) if s.link_flair_text in valid_flairs]
+            return [s for s in self.wsb.new(limit=limit) if s.link_flair_text in valid_flairs]
         else:
-            return [s for s in self.wsb.rising(limit=limit)]
+            return [s for s in self.wsb.new(limit=limit)]
 
     def comment_on_submissions(self, submissions: [Submission], reprocess=False):
         for submission in submissions:

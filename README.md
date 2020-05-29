@@ -12,7 +12,7 @@ The bot can pick tickers out of posts and leave a comment offering people to sub
 ## How to use
 * Send the bot a message or comment on something its posted like `$AAPL $UCO` and you'll be notified when DD mentioning `AAPL` or `UCO` is posted
 * Send it `STOP $AAPL` to be unsubscribed from `$AAPL` DD
-* Right now the bot scans rising posts with the `DD`, `Fundamentals`, `Stocks`, and `Discussion` flairs
+* Right now the bot scans all new posts with the `DD`, `Fundamentals`, `Stocks`, and `Discussion` flairs
 
 ---
 
