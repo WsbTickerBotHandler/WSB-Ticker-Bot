@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: A stack that manages running the WSB Stock Ticker Bot
+Resources:
+  function:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: WsbTickerBotRun
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.8
+      CodeUri: src/.
+      Description: Run the WSB Ticker Bot
+      Timeout: 10
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AmazonDynamoDBFullAccess
+      Layers:
+        - !Ref libs
+      Events:
+        ScheduledRun:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(15 minutes)'
+            Name: RunEveryFifteenMinutes
+            Description: Run every 15 minutes
+
+  libs:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: wsb-ticker-bot-lib
+      Description: Dependencies for the WSB Ticker Bot app
+      ContentUri: package/.
+      CompatibleRuntimes:
+        - python3.8
