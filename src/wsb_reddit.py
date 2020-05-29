@@ -84,15 +84,14 @@ class WSBReddit:
 
     def group_submissions_for_tickers(self, submissions: [Submission], reprocess=False) -> {str: {(str, str)}}:
         tickers_submissions = dict()
+        num_processed = 0
         for submission in submissions:
             # todo: move submission processing flagging to outer scope
             if self.database.has_already_processed(NOTIFIED_SUBMISSIONS_TABLE_NAME, submission.id) and not reprocess:
                 continue
             else:
                 tickers = get_tickers_for_submission(submission)
-                logger.info(tickers)
                 filtered_tickers = [ticker for ticker in tickers if ticker.strip('$') in tickers_set]
-                logger.info(filtered_tickers)
                 for ticker in filtered_tickers:
                     if ticker in tickers_submissions:
                         logger.debug(f'Adding {submission.permalink} to ticker {ticker}')
@@ -101,5 +100,7 @@ class WSBReddit:
                         logger.debug(f'Ticker {ticker} not seen before. Adding with permalink {submission.permalink}')
                         tickers_submissions[ticker] = [(submission.title, submission.permalink)]
                 self.database.add_submission_marker(NOTIFIED_SUBMISSIONS_TABLE_NAME, submission.id)
+                num_processed += 1
+        logger.info(f'Processed {num_processed} new submissions')
 
         return tickers_submissions
