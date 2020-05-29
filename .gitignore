@@ -1,0 +1,8 @@
+.idea/
+*/__pycache__/
+*.pyc
+package/*
+src/praw.ini
+praw.ini
+out.yml
+aws-credentials.ini
