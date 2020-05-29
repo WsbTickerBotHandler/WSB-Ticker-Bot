@@ -38,17 +38,20 @@ class Database:
         )['Attributes']['subscribed_users']['SS']
 
     def unsubscribe_user_from_ticker(self, user: str, ticker: str) -> [str]:
-        return self.client.update_item(
-            TableName='dd-notifications',
-            Key={
-                'ticker': {'S': ticker}
-            },
-            UpdateExpression='DELETE subscribed_users :userToUnsubscribe',
-            ExpressionAttributeValues={
-                ':userToUnsubscribe': {'SS': [user]}
-            },
-            ReturnValues='UPDATED_NEW'
-        )['Attributes']['subscribed_users']['SS']
+        try:
+            return self.client.update_item(
+                TableName='dd-notifications',
+                Key={
+                    'ticker': {'S': ticker}
+                },
+                UpdateExpression='DELETE subscribed_users :userToUnsubscribe',
+                ExpressionAttributeValues={
+                    ':userToUnsubscribe': {'SS': [user]}
+                },
+                ReturnValues='UPDATED_NEW'
+            )['Attributes']['subscribed_users']['SS']
+        except KeyError:
+            return []
 
     def has_already_processed(self, table_name, submission_id) -> bool:
         try:
