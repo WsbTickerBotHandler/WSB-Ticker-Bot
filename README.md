@@ -6,14 +6,15 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
 /u/WSBStockTickerBot scans /r/wsb's new posts and will notify you when DD is posted that includes tickers that you're interested in.
 
 ## How to use
-* Send the bot a message or comment on something it's posted
+* Send /u/WSBStockTickerBot a message or comment on something it's posted **Chat is not supported by Reddit for bots please make sure you send a DM or respond to a /u/WSBStockTickerBot comment**
   * Example: "`$AAPL $UCO`" will subscribe you to the `$AAPL` and `$UCO` tickers
 * Use a message with "stop" at the beginning to be unsubscribed
   * Example: "`STOP $AAPL`"
 * Right now the bot scans all new posts with the `DD`, `Fundamentals`, `Stocks`, and `Discussion` flairs
+* The bot runs every 15 minutes so it will take at most that long to be notified of posts in the 15-minute window since you subscribed
 
 ## Need some help
-* Currently the bot gets rate-limited when making posts, so if you can **upvote its comment** below that would help me out a lot. I'd like to have the bot post on DD-flaired posts with the tickers it finds in them to help other people find it and use it
+* Currently, the bot gets rate-limited when making posts, so if you can **upvote its comment** below that would help me out a lot. I'd like to have the bot post on DD-flaired posts with the tickers it finds in them to help other people find it and use it
 * If you find any issues or have a suggestion or feature you'd like to see, send this account a message or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
 
 ---
