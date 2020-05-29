@@ -1,5 +1,5 @@
 #!/bin/bash
-pipenv run pip freeze > requirements.txt
+pipenv lock -r > requirements.txt
 mkdir -p package/python
 pip install --target package/python -r requirements.txt --upgrade && \
 ARTIFACT_BUCKET=$(cat bucket-name.txt) && \
