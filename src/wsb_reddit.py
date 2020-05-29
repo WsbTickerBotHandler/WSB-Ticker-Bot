@@ -74,6 +74,7 @@ class WSBReddit:
         if body.lower().startswith("stop"):
             logger.info(f'User {author} requested unsubscription from {tickers}')
             [self.database.unsubscribe_user_from_ticker(author.name, ticker) for ticker in tickers]
+            notify_user_of_unsubscription(author, tickers)
         else:
             logger.info(f'User {author} requested subscription to {tickers}')
             [self.database.subscribe_user_to_ticker(author.name, ticker) for ticker in tickers]

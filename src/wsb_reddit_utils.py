@@ -63,6 +63,13 @@ def notify_user_of_subscription(u: Redditor, tickers: [str]):
     )
 
 
+def notify_user_of_unsubscription(u: Redditor, tickers: [str]):
+    u.message(
+        'I\'ve Unsubscribed you from DD',
+        f'I\'ve unsubscribed you from {", ".join(tickers)}'
+    )
+
+
 def make_comment_from_tickers(tickers: [str]):
     return (
         "I'm a bot, REEEEEEEEEEE\n\n"
