@@ -21,7 +21,7 @@ def parse_tickers_from_text(text) -> [str]:
     match_spy = r'\$?SPY|\$?SPX'
     ticker_regex = f"{match_3_5_maybe_with_dollar}|{match_1_5_lowercase_with_dollar}|{match_1_2_with_dollar}|{match_spy}"
 
-    raw_tickers = [t for t in re.findall(ticker_regex, text)]
+    raw_tickers = [t.upper() for t in re.findall(ticker_regex, text)]
 
     # Exclude some common terms which we know are not tickers
     for exclusion in TICKER_EXCLUSIONS:

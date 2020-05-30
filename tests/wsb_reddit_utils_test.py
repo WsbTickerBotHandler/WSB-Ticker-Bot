@@ -30,7 +30,7 @@ text = f'''
 def test_parse_tickers_from_text():
     expected_out = [
         '$ASMR', '$ATH', '$BBWT', '$BF.A', '$BIOX.W', '$BRK.A', '$BRK.B', '$BRMK.W', '$DIS', '$FBI', '$FIVES', '$GAIN',
-        '$R', '$Rip', '$SPY', '$VEM', '$Z', '$ZZ'
+        '$R', '$RIP', '$SPY', '$VEM', '$Z', '$ZZ'
     ]
     assert parse_tickers_from_text(text) == expected_out
 
