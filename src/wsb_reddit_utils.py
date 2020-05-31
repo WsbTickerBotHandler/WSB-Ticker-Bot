@@ -109,5 +109,5 @@ def make_pretty_message(ticker_notifications: [{str: [Submission]}]) -> str:
     pretty_message = ""
     for n in ticker_notifications:
         for ticker, subs in n.items():
-            pretty_message += f'##{ticker}:\n{make_title_links(subs)}'
+            pretty_message += f'## {ticker}:\n{make_title_links(subs)}\n\n'
     return pretty_message
