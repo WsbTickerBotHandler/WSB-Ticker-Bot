@@ -5,5 +5,4 @@ package/*
 bucket-name.txt
 out.yml
 praw.ini
-src/praw.ini
-tests/aws-credentials.ini
+aws-credentials.ini
