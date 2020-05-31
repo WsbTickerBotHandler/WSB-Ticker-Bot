@@ -1,14 +1,12 @@
 import os
+import pickle
 
-combined_file_name = f'{os.path.dirname(__file__)}/combined.txt'
+combined_file_name = f'{os.path.dirname(__file__)}/combined.pkl'
 
 
 def load_tickers():
-    s = set()
-    with open(combined_file_name) as f:
-        for line in f:
-            s.add(line.strip('\n'))
-    return s
+    with open(combined_file_name, 'rb') as f:
+        return pickle.load(f)
 
 
 tickers = load_tickers()

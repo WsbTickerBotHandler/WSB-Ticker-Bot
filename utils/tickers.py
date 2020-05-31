@@ -1,11 +1,12 @@
 import os
 import wget
+import pickle
 import time
 from database import Database
 
 nasdaq_tickers_file_name = 'nasdaqlisted.txt'
 other_tickers_file_name = 'otherlisted.txt'
-combined_file_name = f'{os.path.dirname(__file__)}/combined.txt'
+combined_file_name = f'{os.path.dirname(__file__)}/combined.pkl'
 
 main_tickers_ftp = 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt'
 other_tickers_ftp = 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt'
@@ -28,8 +29,8 @@ def process_tickers():
         for row in csv.DictReader(other_tickers_file, dialect='piper'):
             all_tickers.append(row['ACT Symbol'])
         all_tickers = all_tickers[:-1]
-        with open(combined_file_name, 'w+') as f:
-            f.write("\n".join(all_tickers))
+        with open(combined_file_name, 'wb') as f:
+            pickle.dump(all_tickers, f)
 
         # Uncomment to write to DB, otherwise just update the file and it is small enough to be committed and used
         # chunked_symbols = divide_chunks(all_tickers, 25)
