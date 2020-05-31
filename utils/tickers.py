@@ -23,8 +23,13 @@ def process_tickers():
     with open(nasdaq_tickers_file_name) as nasdaq_tickers_file, open(other_tickers_file_name) as other_tickers_file:
         for row in csv.DictReader(nasdaq_tickers_file, dialect='piper'):
             all_tickers.append(row['Symbol'])
+        # Remove meta info
+        all_tickers = all_tickers[:-1]
+        for row in csv.DictReader(other_tickers_file, dialect='piper'):
+            all_tickers.append(row['ACT Symbol'])
+        all_tickers = all_tickers[:-1]
         with open(combined_file_name, 'w+') as f:
-            f.write("\n".join(all_tickers[:-1]))
+            f.write("\n".join(all_tickers))
 
         # Uncomment to write to DB, otherwise just update the file and it is small enough to be committed and used
         # chunked_symbols = divide_chunks(all_tickers, 25)
@@ -64,5 +69,5 @@ def create_batch_request_items(symbol: str):
 
 
 if __name__ == '__main__':
-    download_tickers()
+    # download_tickers()
     process_tickers()
