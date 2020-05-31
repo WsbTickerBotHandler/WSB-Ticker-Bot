@@ -16,6 +16,8 @@ text = f'''
         BRK.B and BIOX.W should be matched
         $BF.A should be matched
         TLDR: should be excluded
+        ($LULU.) should be included
+        VTIQ... should be too
         Invest in What's Real: SPY
         OTM and ITM should not be matched nor at the end OTM
         $DIS yolo on earnings and DD
@@ -24,6 +26,7 @@ text = f'''
         BBWT will also moon
         $Z sucks, more like $ZZ
         Papa Buffet $ASMR
+        SPX
         South Park has known how the fed operates since 2009
         SPY Perhaps my friend isn’t ready for trading after all...
         Warren Buffet
@@ -33,7 +36,7 @@ text = f'''
 def test_parse_tickers_from_text():
     expected_out = [
         '$ASMR', '$ATH', '$BBWT', '$BF.A', '$BIOX.W', '$BRK.A', '$BRK.B', '$BRMK.W', '$DIS', '$FBI', '$FIVES', '$GAIN',
-        '$R', '$RIP', '$SPY', '$VEM', '$Z', '$ZZ'
+        '$LULU', '$R', '$RIP', '$SPX', '$SPY', '$VEM', '$VTIQ', '$Z', '$ZZ'
     ]
     assert parse_tickers_from_text(text) == expected_out
 

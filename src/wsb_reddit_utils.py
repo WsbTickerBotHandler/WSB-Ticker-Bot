@@ -16,21 +16,30 @@ TICKER_EXCLUSIONS = ["OTM", "ITM", "ATM", "ATH", "MACD", "ROI", "GAIN", "LOSS", 
 
 
 def parse_tickers_from_text(text) -> [str]:
-    match_3_5_maybe_with_dollar = r'\$?[A-Z]{3,5}(?:\.[A-Z]{1})?(?=\s|$)'
-    match_1_5_lowercase_with_dollar = r'\$[A-Za-z]{1,5}(?:\.[A-Za-z]{1})?(?=\s|$)'
-    match_1_2_with_dollar = r'\$[A-Za-z]{1,2}(?:\.[A-Za-z]{1})?(?=\s|$)'
-    match_spy = r'\$?SPY|\$?SPX'
-    ticker_regex = f"{match_3_5_maybe_with_dollar}|{match_1_5_lowercase_with_dollar}|{match_1_2_with_dollar}|{match_spy}"
+    punct_chars = """-.%#,'&/![]()?"""
+    # Won't match LULU\ yet
+    punct_regex = r"(?:[-.%#,'&/!\[\]\(\)\?]*)"
+    three_5 = r'{3,5}'
+    one_2 = r'{1,2}'
+    one_5 = r'{1,5}'
+    one = r'{1}'
+    match_3_5_maybe_with_dollar = fr'\$?[A-Z]{three_5}(?:\.[A-Z]{one})?{punct_regex}(?=\s|$)'
+    match_1_5_lowercase_with_dollar = fr'\$[A-Za-z]{one_5}(?:\.[A-Za-z]{one})?{punct_regex}(?=\s|$)'
+    match_1_2_with_dollar = fr'\$[A-Za-z]{one_2}(?:\.[A-Za-z]{one})?{punct_regex}(?=\s|$)'
+    ticker_regex = f"{match_3_5_maybe_with_dollar}|{match_1_5_lowercase_with_dollar}|{match_1_2_with_dollar}"
 
     raw_tickers = [t.upper() for t in re.findall(ticker_regex, text)]
 
+    # Remove matched punctuation on the ends of tickers
+    stripped_punct = [t.strip(punct_chars) for t in raw_tickers]
+
     # Exclude some common terms which we know are not tickers
     for exclusion in TICKER_EXCLUSIONS:
-        while exclusion in raw_tickers:
-            raw_tickers.remove(exclusion)
+        while exclusion in stripped_punct:
+            stripped_punct.remove(exclusion)
 
     # Add $ to front if it is not there, unique, and sort
-    return list(sorted(set(['$' + ticker if ticker[0] != '$' else ticker for ticker in raw_tickers])))
+    return list(sorted(set(['$' + ticker if ticker[0] != '$' else ticker for ticker in stripped_punct])))
 
 
 def get_tickers_for_submission(submission: Submission) -> [str]:
