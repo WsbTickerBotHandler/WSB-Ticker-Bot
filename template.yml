@@ -22,7 +22,7 @@ Resources:
         ScheduledRun:
           Type: Schedule
           Properties:
-            Schedule: 'rate(15 minutes)'
+            Schedule: 'cron(0/15 * * * ? *)'
             Name: RunEveryFifteenMinutes
             Description: Run every 15 minutes
 
