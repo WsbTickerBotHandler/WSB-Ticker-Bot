@@ -28,8 +28,8 @@ class WSBReddit:
         self.notify_users(submissions)
 
     def get_submissions(self, flair_filter=False, limit=30) -> [Submission]:
-        # valid_flairs = {'DD', 'Fundamentals', 'Stocks', 'Options', 'Discussion'}
-        valid_flairs = {'DD'}
+        valid_flairs = {'DD', 'Fundamentals', 'Discussion'}
+        # valid_flairs = {'DD'}
         subs = self.wsb.new(limit=limit)
         if flair_filter:
             return [s for s in subs if s.link_flair_text in valid_flairs]

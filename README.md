@@ -10,7 +10,7 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
   * Example: "`$AAPL $UCO`" will subscribe you to the `$AAPL` and `$UCO` tickers
 * Use a message with "stop" at the beginning to be unsubscribed
   * Example: "`STOP $AAPL`"
-* Right now the bot scans all new posts with the `DD`, `Fundamentals`, `Stocks`, and `Discussion` flairs
+* Right now the bot scans all new posts with the `DD`, `Fundamentals`, and `Discussion` flairs
 * The bot runs every 15 minutes so it will take at most that long to be notified of posts in the 15-minute window since you subscribed
 
 ## Need some help
