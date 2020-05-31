@@ -1,4 +1,7 @@
+import pytest
+
 from wsb_reddit_utils import *
+from fixtures import *
 
 
 text = f'''
@@ -45,3 +48,7 @@ def test_make_comment_from_tickers():
     )
     assert make_comment_from_tickers(["$SPY", "$TSLA", "$AAPL"]) == expected_coment
 
+
+@pytest.mark.integration
+def test_notify_user_of_error(a_submission, a_user: Redditor):
+    notify_user_of_error(a_user)

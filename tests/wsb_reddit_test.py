@@ -5,6 +5,7 @@ from wsb_reddit_utils import get_tickers_for_submission
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 @pytest.mark.integration
 def test_get_submissions(wsb_reddit_client):
     logger.info(wsb_reddit_client.get_submissions())

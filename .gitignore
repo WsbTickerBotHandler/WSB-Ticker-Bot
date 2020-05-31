@@ -3,7 +3,7 @@
 *.pyc
 package/*
 bucket-name.txt
-src/praw.ini
-praw.ini
 out.yml
-aws-credentials.ini
+praw.ini
+src/praw.ini
+tests/aws-credentials.ini

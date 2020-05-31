@@ -1,4 +1,5 @@
 import re
+import os
 import logging
 
 from praw.models import Redditor, Submission
@@ -70,6 +71,15 @@ def notify_user_of_unsubscription(u: Redditor, tickers: [str]):
     )
 
 
+def notify_user_of_error(u: Redditor):
+    with open(f'{os.path.dirname(__file__)}/resources/instructions.md') as f:
+        u.message(
+            "I couldn't understand you",
+            f'Hey {u.name}, try using these instructions:\n\n'
+            f'{f.read()}'
+        )
+
+
 def make_comment_from_tickers(tickers: [str]):
     return (
         "I'm a bot, REEEEEEEEEEE\n\n"
@@ -80,11 +90,11 @@ def make_comment_from_tickers(tickers: [str]):
     )
 
 
-def make_pretty_message(ticker_notifications: [{str: [(str, str)]}]) -> str:
-    def make_title_links(submissions):
+def make_pretty_message(ticker_notifications: [{str: [Submission]}]) -> str:
+    def make_title_links(submissions: [Submission]):
         title_links = ""
-        for title, link in submissions:
-            title_links += f'- [{title}]({link})\n'
+        for s in submissions:
+            title_links += f'- [{s.title}]({s.permalink})\n'
         return title_links
 
     pretty_message = ""

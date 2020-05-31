@@ -1,5 +1,6 @@
 import boto3
 from boto3 import Session
+from botocore.exceptions import ProfileNotFound
 
 COMMENTED_SUBMISSIONS_TABLE_NAME = 'commented-submissions'
 NOTIFIED_SUBMISSIONS_TABLE_NAME = 'notified-submissions'
@@ -7,9 +8,11 @@ NOTIFIED_SUBMISSIONS_TABLE_NAME = 'notified-submissions'
 
 class Database:
     def __init__(self):
-        # Useful for local development using an aws profile
-        # self.session: Session = boto3.session.Session(profile_name="wsb-ticker-bot")
-        self.session: Session = boto3.session.Session()
+        try:
+            # Useful for local development using an aws profile, will fail on lambda but method below will succeed
+            self.session: Session = boto3.session.Session(profile_name="wsb-ticker-bot")
+        except ProfileNotFound:
+            self.session: Session = boto3.session.Session()
         self.client = self.session.client('dynamodb')
 
     def get_users_subscribed_to_ticker(self, ticker: str) -> [str]:

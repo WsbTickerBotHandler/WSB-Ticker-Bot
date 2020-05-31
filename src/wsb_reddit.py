@@ -17,20 +17,24 @@ class WSBReddit:
         self.database = Database()
 
     def process_inbox(self):
-        messages = self.reddit.inbox.unread()
-        for message in messages:
+        num_processed = 0
+        for message in self.reddit.inbox.unread():
             self.handle_message(message)
+            num_processed += 1
+        logger.info(f'Processed {num_processed} user messages')
 
     def process_submissions(self, submissions: [Submission]):
         # self.comment_on_submissions(submissions)
         self.notify_users(submissions)
 
     def get_submissions(self, flair_filter=False, limit=30) -> [Submission]:
-        valid_flairs = {'DD', 'Fundamentals', 'Stocks', 'Discussion'}
+        # valid_flairs = {'DD', 'Fundamentals', 'Stocks', 'Options', 'Discussion'}
+        valid_flairs = {'DD'}
+        subs = self.wsb.new(limit=limit)
         if flair_filter:
-            return [s for s in self.wsb.new(limit=limit) if s.link_flair_text in valid_flairs]
+            return [s for s in subs if s.link_flair_text in valid_flairs]
         else:
-            return [s for s in self.wsb.new(limit=limit)]
+            return [s for s in subs]
 
     def comment_on_submissions(self, submissions: [Submission], reprocess=False):
         for submission in submissions:
@@ -46,13 +50,13 @@ class WSBReddit:
 
     def notify_users(self, submissions: [Submission], reprocess=False):
         notifications = dict()
-        tickers_with_submissions: {str: {(str, str)}} = self.group_submissions_for_tickers(
+        tickers_with_submissions: {str: [Submission]} = self.group_submissions_for_tickers(
             submissions, reprocess=reprocess
         )
+        logger.info(f'Found {len(tickers_with_submissions)} tickers')
         for ticker, subs in tickers_with_submissions.items():
-            logger.info(f'Found ticker {ticker} mentioned in posts {subs}')
+            logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
-            logger.debug(f'Users subscribed to {ticker} were {users_to_notify}')
             for u in users_to_notify:
                 if u in notifications:
                     notifications[u].append({ticker: subs})
@@ -64,14 +68,20 @@ class WSBReddit:
                 'New DD posted!',
                 make_pretty_message(ticker_notifications)
             )
-            logger.info(f'Notified {u} about tickers {ticker_notifications}')
+        logger.info(f'Notified {len(notifications)} users about tickers')
 
     def handle_message(self, item: Union[Message, Comment]):
         body: str = item.body
         author: Redditor = item.author
-        tickers = parse_tickers_from_text(body)
+        tickers: [str] = parse_tickers_from_text(body)
 
-        if body.lower().startswith("stop"):
+        if tickers.count() == 0 and not item.was_comment():
+            logger.info(f'User {author} submitted uninterpretable message: {body}')
+            notify_user_of_error(author)
+        elif tickers.count() == 0 and item.was_comment():
+            item.mark_read()
+            return
+        elif body.lower().startswith("stop"):
             logger.info(f'User {author} requested unsubscription from {tickers}')
             [self.database.unsubscribe_user_from_ticker(author.name, ticker) for ticker in tickers]
             notify_user_of_unsubscription(author, tickers)
@@ -82,7 +92,7 @@ class WSBReddit:
 
         item.mark_read()
 
-    def group_submissions_for_tickers(self, submissions: [Submission], reprocess=False) -> {str: {(str, str)}}:
+    def group_submissions_for_tickers(self, submissions: [Submission], reprocess=False) -> {str: [Submission]}:
         tickers_submissions = dict()
         num_processed = 0
         for submission in submissions:
@@ -94,11 +104,9 @@ class WSBReddit:
                 filtered_tickers = [ticker for ticker in tickers if ticker.strip('$') in tickers_set]
                 for ticker in filtered_tickers:
                     if ticker in tickers_submissions:
-                        logger.debug(f'Adding {submission.permalink} to ticker {ticker}')
                         tickers_submissions[ticker].append((submission.title, submission.permalink))
                     else:
-                        logger.debug(f'Ticker {ticker} not seen before. Adding with permalink {submission.permalink}')
-                        tickers_submissions[ticker] = [(submission.title, submission.permalink)]
+                        tickers_submissions[ticker] = [submission]
                 self.database.add_submission_marker(NOTIFIED_SUBMISSIONS_TABLE_NAME, submission.id)
                 num_processed += 1
         logger.info(f'Processed {num_processed} new submissions')
