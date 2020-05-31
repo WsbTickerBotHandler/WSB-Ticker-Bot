@@ -53,7 +53,7 @@ class WSBReddit:
         tickers_with_submissions: {str: [Submission]} = self.group_submissions_for_tickers(
             submissions, reprocess=reprocess
         )
-        logger.info(f'Found {len(tickers_with_submissions)} tickers')
+        logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)}) in {len(submissions)} submissions')
         for ticker, subs in tickers_with_submissions.items():
             logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
