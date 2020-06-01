@@ -62,8 +62,8 @@ class WSBReddit:
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
             if len(users_to_notify) > 0:
                 logger.info(f'Notifying {len(users_to_notify)} users about ticker {ticker}')
-            for u in users_to_notify:
                 notified_tickers += ticker
+            for u in users_to_notify:
                 if u in notifications:
                     notifications[u].append({ticker: subs})
                 else:
@@ -74,7 +74,8 @@ class WSBReddit:
                 'New DD posted!',
                 make_pretty_message(ticker_notifications)
             )
-        logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
+        if len(notifications) > 0:
+            logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
     def handle_message(self, item: Union[Message, Comment]):
         body: str = item.body
