@@ -54,7 +54,7 @@ class WSBReddit:
 
     def notify_users(self, tickers_with_submissions: {str: [Submission]}):
         notifications = dict()
-        notified_tickers = []
+        notified_tickers = set()
 
         len(tickers_with_submissions) > 0 and logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)})')
         for ticker, subs in tickers_with_submissions.items():
@@ -62,7 +62,7 @@ class WSBReddit:
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
             if len(users_to_notify) > 0:
                 logger.info(f'Notifying {len(users_to_notify)} users about ticker {ticker}')
-                notified_tickers += ticker
+                notified_tickers.add(ticker)
             for u in users_to_notify:
                 if u in notifications:
                     notifications[u].append({ticker: subs})
