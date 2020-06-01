@@ -21,7 +21,7 @@ class WSBReddit:
         for message in self.reddit.inbox.unread():
             self.handle_message(message)
             num_processed += 1
-        logger.info(f'Processed {num_processed} user messages')
+        num_processed > 0 and logger.info(f'Processed {num_processed} user messages')
 
     def process_submissions(self, submissions: [Submission], reprocess=False):
         # self.comment_on_submissions(submissions)
@@ -48,7 +48,7 @@ class WSBReddit:
                 tickers = get_tickers_for_submission(submission)
                 filtered_tickers = [ticker for ticker in tickers if ticker.strip('$') in tickers_set]
                 if len(filtered_tickers) != 0:
-                    logger.info(f'Commenting on {submission.title}')
+                    logger.info(f'Commenting on submission {submission.id}')
                     submission.reply(make_comment_from_tickers(filtered_tickers))
                 self.database.add_submission_marker(COMMENTED_SUBMISSIONS_TABLE_NAME, submission.id)
 
@@ -56,7 +56,7 @@ class WSBReddit:
         notifications = dict()
         notified_tickers = []
 
-        logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)})')
+        len(tickers_with_submissions) > 0 and logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)})')
         for ticker, subs in tickers_with_submissions.items():
             logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
@@ -74,8 +74,7 @@ class WSBReddit:
                 'New DD posted!',
                 make_pretty_message(ticker_notifications)
             )
-        if len(notifications) > 0:
-            logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
+        len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
     def handle_message(self, item: Union[Message, Comment]):
         body: str = item.body
@@ -116,6 +115,6 @@ class WSBReddit:
                         tickers_submissions[ticker] = [submission]
                 self.database.add_submission_marker(NOTIFIED_SUBMISSIONS_TABLE_NAME, submission.id)
                 num_processed += 1
-        logger.info(f'Processed {num_processed} new submissions')
+        num_processed > 0 and logger.info(f'Processed {num_processed} new submissions')
 
         return tickers_submissions
