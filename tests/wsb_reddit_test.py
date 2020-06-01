@@ -40,7 +40,7 @@ def test_comment_on_submission(wsb_reddit_client, a_submission):
 
 @pytest.mark.integration
 def test_notify_users(wsb_reddit_client, a_submission):
-    wsb_reddit_client.notify_users([a_submission], reprocess=True)
+    wsb_reddit_client.notify_users([a_submission])
 
 
 @pytest.mark.integration

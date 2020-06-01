@@ -23,9 +23,13 @@ class WSBReddit:
             num_processed += 1
         logger.info(f'Processed {num_processed} user messages')
 
-    def process_submissions(self, submissions: [Submission]):
+    def process_submissions(self, submissions: [Submission], reprocess=False):
         # self.comment_on_submissions(submissions)
-        self.notify_users(submissions)
+        logger.info(f'Retrieved {len(submissions)} submissions')
+        tickers_with_submissions: {str: [Submission]} = self.group_submissions_for_tickers(
+            submissions, reprocess=reprocess
+        )
+        self.notify_users(tickers_with_submissions)
 
     def get_submissions(self, flair_filter=False, limit=30) -> [Submission]:
         valid_flairs = {'DD', 'Fundamentals', 'Discussion'}
@@ -48,12 +52,9 @@ class WSBReddit:
                     submission.reply(make_comment_from_tickers(filtered_tickers))
                 self.database.add_submission_marker(COMMENTED_SUBMISSIONS_TABLE_NAME, submission.id)
 
-    def notify_users(self, submissions: [Submission], reprocess=False):
+    def notify_users(self, tickers_with_submissions: {str: [Submission]}):
         notifications = dict()
-        tickers_with_submissions: {str: [Submission]} = self.group_submissions_for_tickers(
-            submissions, reprocess=reprocess
-        )
-        logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)}) in {len(submissions)} submissions')
+        logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)})')
         for ticker, subs in tickers_with_submissions.items():
             logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)

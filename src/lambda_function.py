@@ -4,17 +4,32 @@ from wsb_reddit import *
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+DEFAULT_SUBMISSION_LIMIT = 30
+DEFAULT_REPROCESS = False
+
 
 def lambda_handler(event, context):
-    logger.info(f"Running... {event}")
-    run()
+    try:
+        event['submission_limit']
+    except KeyError:
+        event['submission_limit'] = DEFAULT_SUBMISSION_LIMIT
+    try:
+        event['reprocess']
+    except KeyError:
+        event['reprocess'] = DEFAULT_REPROCESS
+
+    logger.info(f"Running with settings: {event}")
+    run(
+        event['submission_limit'],
+        event['reprocess']
+    )
     logger.info("Finished Running")
 
 
-def run():
+def run(submission_limit: int, reprocess: bool):
 
     wsb_reddit = WSBReddit()
-    submissions = wsb_reddit.get_submissions(flair_filter=True)
+    submissions = wsb_reddit.get_submissions(flair_filter=True, limit=submission_limit)
 
     wsb_reddit.process_inbox()
-    wsb_reddit.process_submissions(submissions)
+    wsb_reddit.process_submissions(submissions, reprocess=reprocess)
