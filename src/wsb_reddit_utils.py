@@ -11,7 +11,7 @@ MAX_TICKERS = 10
 # These will be excluded unless there is a $ before them
 TICKER_EXCLUSIONS = ["OTM", "ITM", "ATM", "ATH", "MACD", "ROI", "GAIN", "LOSS", "TLDR", "CEO", "WSB", "EOD", "YTD",
                      "LLC", "IMO", "CEO", "CFO", "FBI", "SEC", "THE", "NYSE", "USA", "IMF", "AND", "BABY", "EST", "PDT",
-                     "IPO", "YOLO"
+                     "IPO", "YOLO", "LONG", "VEGA", "THETA", "GAMMA", "DELTA"
                      ]
 
 
