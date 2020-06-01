@@ -75,10 +75,10 @@ class WSBReddit:
         author: Redditor = item.author
         tickers: [str] = parse_tickers_from_text(body)
 
-        if tickers.count() == 0 and not item.was_comment():
+        if len(tickers) == 0 and not item.was_comment():
             logger.info(f'User {author} submitted uninterpretable message: {body}')
             notify_user_of_error(author)
-        elif tickers.count() == 0 and item.was_comment():
+        elif len(tickers) == 0 and item.was_comment():
             item.mark_read()
             return
         elif body.lower().startswith("stop"):
