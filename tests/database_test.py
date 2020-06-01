@@ -16,7 +16,8 @@ def test_get_users_subscribed_to_ticker(db_client):
 
 @pytest.mark.integration
 def test_subscribe_user_to_ticker(db_client):
-    assert db_client.subscribe_user_to_ticker("User0", "$JUJU") == ["User0", "User1", "User2"]
+    ts = ["$JUJU"]
+    [db_client.subscribe_user_to_ticker("Some_User", t) for t in ts]
 
 
 @pytest.mark.integration
