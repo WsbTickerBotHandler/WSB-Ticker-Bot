@@ -54,11 +54,15 @@ class WSBReddit:
 
     def notify_users(self, tickers_with_submissions: {str: [Submission]}):
         notifications = dict()
+        notified_tickers = []
+
         logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)})')
         for ticker, subs in tickers_with_submissions.items():
             logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
+            logger.info(f'Notifying {len(users_to_notify)} users about ticker {ticker}')
             for u in users_to_notify:
+                notified_tickers += ticker
                 if u in notifications:
                     notifications[u].append({ticker: subs})
                 else:
@@ -69,7 +73,7 @@ class WSBReddit:
                 'New DD posted!',
                 make_pretty_message(ticker_notifications)
             )
-        logger.info(f'Notified {len(notifications)} users about tickers')
+        logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
     def handle_message(self, item: Union[Message, Comment]):
         body: str = item.body
