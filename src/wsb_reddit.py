@@ -60,7 +60,8 @@ class WSBReddit:
         for ticker, subs in tickers_with_submissions.items():
             logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
-            logger.info(f'Notifying {len(users_to_notify)} users about ticker {ticker}')
+            if len(users_to_notify) > 0:
+                logger.info(f'Notifying {len(users_to_notify)} users about ticker {ticker}')
             for u in users_to_notify:
                 notified_tickers += ticker
                 if u in notifications:
