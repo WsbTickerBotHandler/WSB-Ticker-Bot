@@ -6,7 +6,10 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
 [/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) scans [/r/wsb](https://www.reddit.com/r/wallstreetbets/ "WSB")'s new posts and will notify you when DD is posted that includes tickers that you're interested in.
 
 ## How to use
-* [Click here to send a subscription message!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message=You%27ll%20be%20subscribed%20to%20%24SPY%20as%20an%20example%0AType%20more%20tickers%20here%20and%2For%20erase%20the%20line%20above%20if%20you%20don%27t%20want%20it)
+**EASY>>** [CLICK HERE TO DRAFT A QUICK SUBSCRIBE MESSAGE!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message=You%27ll%20be%20subscribed%20to%20%24SPY%20as%20an%20example%0AType%20more%20tickers%20here%20and%2For%20erase%20the%20line%20above%20if%20you%20don%27t%20want%20it) **<<EASY**
+
+Or...
+
 * Send [/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) a message or comment on something it's posted. **Chat is not supported by Reddit for bots please make sure you send a DM or respond to a [/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) comment**
   * Example: "`$AAPL $UCO`" will subscribe you to the `$AAPL` and `$UCO` tickers
 * Use a message with "stop" at the beginning to be unsubscribed
