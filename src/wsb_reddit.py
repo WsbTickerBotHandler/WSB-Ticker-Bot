@@ -1,5 +1,6 @@
 from typing import Union
 import logging
+import concurrent.futures
 from database import *
 from wsb_reddit_utils import *
 from praw.reddit import Reddit
@@ -69,11 +70,16 @@ class WSBReddit:
                 else:
                     notifications[u] = [{ticker: subs}]
 
-        for u, ticker_notifications in notifications.items():
-            self.reddit.redditor(u).message(
+        def notify(notification):
+            user_to_notify, notify_about_these = notification
+            self.reddit.redditor(user_to_notify).message(
                 'New DD posted!',
-                make_pretty_message(ticker_notifications)
+                make_pretty_message(notify_about_these)
             )
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            executor.map(notify, notifications.items())
+
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
     def handle_message(self, item: Union[Message, Comment]):

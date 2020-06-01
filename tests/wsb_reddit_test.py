@@ -39,10 +39,5 @@ def test_comment_on_submission(wsb_reddit_client, a_submission):
 
 
 @pytest.mark.integration
-def test_notify_users(wsb_reddit_client, a_submission):
-    wsb_reddit_client.notify_users([a_submission])
-
-
-@pytest.mark.integration
-def test_process_rising_posts(wsb_reddit_client, a_submission):
-    wsb_reddit_client.process_submissions([a_submission])
+def test_process_submissions(wsb_reddit_client, a_submission):
+    wsb_reddit_client.process_submissions([a_submission], reprocess=True)
