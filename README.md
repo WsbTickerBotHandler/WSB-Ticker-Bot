@@ -6,7 +6,7 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
 **[/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) scans [/r/wsb](https://www.reddit.com/r/wallstreetbets/ "WSB")'s new posts and will notify you when DD is being posted about tickers you're interested in**
 
 ## How to use
-**EASY>>** [CLICK HERE TO DRAFT A QUICK TICKER SUBSCRIBE MESSAGE!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message=You%27ll%20be%20subscribed%20to%20%24MSFT%20and%20%24AAPL%20as%20an%20example%0AType%20more%20tickers%20anywhere%20and%2For%20erase%20the%20line%20above%20if%20you%20don%27t%20want%20those) **<<EASY**
+**EASY>>** [CLICK HERE TO SUBSCRIBE TO A TICKER(S)!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message=You%27ll%20be%20subscribed%20to%20%24MSFT%20and%20%24AAPL%20as%20an%20example%0AType%20more%20tickers%20anywhere%20and%2For%20erase%20the%20line%20above%20if%20you%20don%27t%20want%20those) **<<EASY**
 
 **EASY>>** [CLICK HERE TO SUBSCRIBE TO ALL NEW DD!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message=ALL%20DD) **<<EASY**
 
@@ -20,11 +20,12 @@ Or...
 
 ## A couple things to know
 * If you subscribed to an individual ticker you'll be notified of new posts with the `DD` flair for that ticker
-* If you subscribed to the "ALL" feed, you'll be notified of new posts 
+* If you subscribed to the "ALL DD" feed, you'll be notified of all new `DD` flaired posts 
 
 ## Need some help
 * Currently, the bot can be rate-limited when making posts. If you can give the bot some orange arrows would help. I'd like to have the bot post on rising DD-flaired posts with the tickers it finds in them to help other people find and use it
 * If you find any issues or have a suggestion or feature you'd like to see, send a message to [/u/WSBTickerBotHandler](https://www.reddit.com/user/WSBTickerBotHandler) or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
+* Stopping your "ALL DD" subscription will not stop individual tickers you've subscribed to separately
 
 ---
 
