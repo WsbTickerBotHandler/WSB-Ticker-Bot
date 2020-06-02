@@ -47,7 +47,7 @@ def get_tickers_for_submission(submission: Submission) -> [str]:
     logger.debug(submission.title + "\n" + (submission.selftext if submission.is_self else "LINK POST\n"))
     tickers = parse_tickers_from_text(submission.title + "\n" + ((submission.selftext + "\n") if submission.is_self else "\n"))
     # A post might spam capital words, so if we detect more than 10 tickers, don't return it
-    if len(tickers) <= MAX_TICKERS:
+    if len(tickers) <= MAX_TICKERS or submission.link_flair_text == 'DD':
         return [t.upper() for t in tickers if len(t) != 0]
     else:
         logger.warning(f'Submission {submission.id} has more than {MAX_TICKERS} and is being excluded from processing')
