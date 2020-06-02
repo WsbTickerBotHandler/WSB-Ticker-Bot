@@ -8,12 +8,12 @@ logger.setLevel(logging.INFO)
 
 @pytest.mark.integration
 def test_get_submissions(wsb_reddit_client):
-    logger.info(wsb_reddit_client.get_submissions())
+    logger.info(wsb_reddit_client.get_submissions(1))
 
 
 @pytest.mark.integration
 def test_get_tickers_for_submissions(wsb_reddit_client):
-    submissions = wsb_reddit_client.get_submissions()
+    submissions = wsb_reddit_client.get_submissions(5)
     [logger.info((s.id, get_tickers_for_submission(s))) for s in submissions]
 
 
@@ -40,4 +40,7 @@ def test_comment_on_submission(wsb_reddit_client, a_submission):
 
 @pytest.mark.integration
 def test_process_submissions(wsb_reddit_client, a_submission):
+    import time
+    start_time = time.time()
     wsb_reddit_client.process_submissions([a_submission], reprocess=True)
+    logger.info("--- %s seconds ---" % (time.time() - start_time))

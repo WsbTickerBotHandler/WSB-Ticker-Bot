@@ -36,7 +36,7 @@ class WSBReddit:
         )
         self.notify_users(tickers_with_submissions)
 
-    def get_submissions(self, flair_filter=False, limit=30) -> [Submission]:
+    def get_submissions(self, limit, flair_filter=False) -> [Submission]:
         valid_flairs = {'DD', 'Fundamentals', 'Discussion'}
         # valid_flairs = {'DD'}
         subs = self.wsb.new(limit=limit)
