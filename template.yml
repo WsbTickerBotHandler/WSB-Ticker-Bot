@@ -14,7 +14,7 @@ Resources:
       Runtime: python3.8
       CodeUri: src/.
       Description: Run the WSB Ticker Bot
-      Timeout: 120
+      Timeout: 180
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole

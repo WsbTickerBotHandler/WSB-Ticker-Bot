@@ -23,7 +23,7 @@ class WSBReddit:
 
     def process_inbox(self):
         num_processed = 0
-        for message in self.reddit.inbox.unread():
+        for message in self.reddit.inbox.unread(limit=50):
             self.handle_message(message)
             num_processed += 1
         num_processed > 0 and logger.info(f'Processed {num_processed} user messages')
@@ -115,8 +115,10 @@ class WSBReddit:
 
         if body.lower() == "all dd":
             self.database.subscribe_user_to_all_dd_feed(author.name)
+            logger.info(f'User {author} requested subscription to all DD')
             notify_user_of_all_subscription(author)
         elif body.lower() == "stop all":
+            logger.info(f'User {author} requested unsubscription from all DD')
             self.database.unsubscribe_user_from_all_dd_feed(author.name)
             notify_user_of_all_unsubscription()
         elif len(tickers) == 0 and not item.was_comment:
