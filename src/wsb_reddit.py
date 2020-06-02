@@ -35,6 +35,8 @@ class WSBReddit:
             submissions, reprocess=reprocess
         )
         self.notify_users(tickers_with_submissions)
+        [self.database.add_submission_marker(NOTIFIED_SUBMISSIONS_TABLE_NAME, submission.id) for submission in submissions]
+        logger.info(f'Processed {len(submissions)} submissions')
 
     def get_submissions(self, limit, flair_filter=False) -> [Submission]:
         # valid_flairs = {'DD', 'Discussion', 'Fundamentals'}
@@ -153,8 +155,7 @@ class WSBReddit:
                         tickers_submissions[ticker].append((submission.title, submission.permalink))
                     else:
                         tickers_submissions[ticker] = [submission]
-                self.database.add_submission_marker(NOTIFIED_SUBMISSIONS_TABLE_NAME, submission.id)
                 num_processed += 1
-        num_processed > 0 and logger.info(f'Processed {num_processed} new submissions')
+        num_processed > 0 and logger.info(f'Grabbed {num_processed} new submissions')
 
         return tickers_submissions
