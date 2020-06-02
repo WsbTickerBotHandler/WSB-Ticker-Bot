@@ -1,5 +1,6 @@
 import re
 import os
+from itertools import islice
 import logging
 import urllib.parse
 import random
@@ -142,3 +143,9 @@ def make_pretty_message(ticker_notifications: [{}]) -> str:
     for n in ticker_notifications:
         pretty_message += f'## {n["ticker"]}:\n{make_title_links(n["subs"])}\n\n'
     return pretty_message
+
+
+def chunks(data, size):
+    it = iter(data)
+    for i in range(0, len(data), size):
+        yield {k: data[k] for k in islice(it, size)}

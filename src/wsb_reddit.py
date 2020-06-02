@@ -2,7 +2,7 @@ from typing import Union
 import time
 import logging
 import concurrent.futures
-from itertools import islice
+
 from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
 from wsb_reddit_utils import *
 from praw.reddit import Reddit
@@ -62,6 +62,7 @@ class WSBReddit:
                 self.database.add_submission_marker(COMMENTED_SUBMISSIONS_TABLE_NAME, submission.id)
 
     def notify_users(self, tickers_with_submissions: {str: [Submission]}):
+        MAX_USERS_TO_NOTIFY_PER_CHUNK = 60
         notifications = dict()
         notified_tickers = set()
         users_subscribed_to_all: [str] = []
@@ -98,11 +99,6 @@ class WSBReddit:
 
         logger.debug(f'Notifications object: {notifications}')
 
-        def chunks(data, size=60):
-            it = iter(data)
-            for i in range(0, len(data), size):
-                yield {k: data[k] for k in islice(it, size)}
-
         def notify(notification):
             try:
                 user_to_notify, notify_about_these_subs = notification
@@ -113,15 +109,22 @@ class WSBReddit:
             except Exception as e:
                 logger.error(f'Notification of user {users_to_notify} ran into an error: {e}')
 
-        for chunk in chunks(notifications):
+        chunked_notifications = chunks(notifications, size=MAX_USERS_TO_NOTIFY_PER_CHUNK)
+        remaining_chunks_to_process = len(chunked_notifications)
+        for chunk in chunked_notifications:
             start_time = time.time()
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.map(notify, chunk.items())
             time_taken = (time.time() - start_time)
             sleep_for = 61 - time_taken
-            logger.info(f'Took {int(time_taken)} seconds to notify 50 users, sleeping for {sleep_for} seconds')
+
+            remaining_chunks_to_process -= 1
             # Reddit limits us to 60 requests/min so wait 1 min before making 50 more requests
-            time.sleep(sleep_for)
+            if remaining_chunks_to_process > 0:
+                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users. Sleeping for {sleep_for} seconds...')
+                time.sleep(sleep_for)
+            else:
+                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())}')
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
