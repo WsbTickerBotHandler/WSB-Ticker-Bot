@@ -1,6 +1,8 @@
 from typing import Union
+import time
 import logging
 import concurrent.futures
+from itertools import islice
 from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
 from wsb_reddit_utils import *
 from praw.reddit import Reddit
@@ -95,6 +97,11 @@ class WSBReddit:
 
         logger.debug(f'Notifications object: {notifications}')
 
+        def chunks(data, size=9):
+            it = iter(data)
+            for i in range(0, len(data), size):
+                yield {k: data[k] for k in islice(it, size)}
+
         def notify(notification):
             try:
                 user_to_notify, notify_about_these_subs = notification
@@ -105,8 +112,10 @@ class WSBReddit:
             except Exception as e:
                 logger.error(f'Notification of user {users_to_notify} ran into an error: {e}')
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-            executor.map(notify, notifications.items())
+        for chunk in chunks(notifications):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+                executor.map(notify, chunk.items())
+            time.sleep(1)
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
