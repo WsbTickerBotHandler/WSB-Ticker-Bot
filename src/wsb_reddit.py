@@ -116,10 +116,10 @@ class WSBReddit:
         if body.lower() == "all dd":
             self.database.subscribe_user_to_all_dd_feed(author.name)
             notify_user_of_all_subscription(author)
-        if body.lower() == "stop all":
+        elif body.lower() == "stop all":
             self.database.unsubscribe_user_from_all_dd_feed(author.name)
             notify_user_of_all_unsubscription()
-        if len(tickers) == 0 and not item.was_comment:
+        elif len(tickers) == 0 and not item.was_comment:
             logger.info(f'User {author} submitted uninterpretable message: {body}')
             notify_user_of_error(author)
         elif len(tickers) == 0 and item.was_comment:
