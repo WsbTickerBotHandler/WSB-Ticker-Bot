@@ -17,6 +17,10 @@ class WSBReddit:
         self.wsb = self.reddit.subreddit("wallstreetbets")
         self.database = Database()
 
+    @staticmethod
+    def get_another_reddit_instance():
+        return Reddit("WSBStockTickerBot")
+
     def process_inbox(self):
         num_processed = 0
         for message in self.reddit.inbox.unread():
@@ -72,7 +76,7 @@ class WSBReddit:
 
         def notify(notification):
             user_to_notify, notify_about_these = notification
-            self.reddit.redditor(user_to_notify).message(
+            self.get_another_reddit_instance().redditor(user_to_notify).message(
                 'New DD posted!',
                 make_pretty_message(notify_about_these)
             )
