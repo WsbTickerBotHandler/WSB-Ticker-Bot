@@ -2,8 +2,10 @@ import re
 import os
 import logging
 import urllib.parse
+import random
 
 from praw.models import Redditor, Submission
+from stock_data.tickers import tickers as tickers_set
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -82,10 +84,16 @@ def notify_user_of_unsubscription(u: Redditor, tickers: [str]):
 
 
 def notify_user_of_all_subscription(u: Redditor):
+    # u.message(
+    #     "I've subscribed you to all DD",
+    #     "You'll be notified when any new DD is posted\n\n\n\n" +
+    #     'To stop your subscription to all DD, reply `stop all`'
+    # )
+    ticker = random.choice(tuple(tickers_set))
     u.message(
-        "I've subscribed you to all DD",
-        "You'll be notified when any new DD is posted\n\n\n\n" +
-        'To stop your subscription to all DD, reply `stop all`'
+        "The ALL DD feed is temporarily disabled",
+        "You'll still be subscribed, but you won't receive notifications until it's re-enabled\n\n\n\n" +
+        f'In the meantime, you can subscribe to DD for specific tickers [here](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=%20%24{ticker})'
     )
 
 

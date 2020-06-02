@@ -32,4 +32,4 @@ def run(submission_limit: int, reprocess: bool):
     submissions = wsb_reddit.get_submissions(limit=submission_limit, flair_filter=True)
 
     wsb_reddit.process_inbox()
-    # wsb_reddit.process_submissions(submissions, reprocess=reprocess)
+    wsb_reddit.process_submissions(submissions, reprocess=reprocess)
