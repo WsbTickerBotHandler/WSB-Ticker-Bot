@@ -156,6 +156,6 @@ class WSBReddit:
                     else:
                         tickers_submissions[ticker] = [submission]
                 num_processed += 1
-        num_processed > 0 and logger.info(f'Grabbed {num_processed} new submissions')
+        logger.info(f'Grabbed {num_processed} new submissions')
 
         return tickers_submissions
