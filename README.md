@@ -14,12 +14,12 @@ Or...
 
 * Send [/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) a message or comment on something it's posted. **Chat is not supported by Reddit for bots please make sure you send a DM or respond to a [/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) comment**
   * Example: `$AAPL $UCO` will subscribe you to the `$AAPL` and `$UCO` tickers
-* Use a message with stop at the beginning to be unsubscribed from tickers
+* Use a message with stop at the beginning to be unsubscribed from specific tickers
   * Example: `STOP $AAPL`
 * Use `STOP ALL` to unsubscribe from the "ALL DD" feed
 
 ## A couple things to know
-* If you subscribed to an individual ticker you'll be notified of new posts with the `DD`, `Fundamentals`, and `Discussion` flairs for that ticker
+* If you subscribed to an individual ticker you'll be notified of new posts with the `DD` flair for that ticker
 * If you subscribed to the "ALL" feed, you'll be notified of new posts 
 
 ## Need some help

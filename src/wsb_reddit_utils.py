@@ -69,7 +69,7 @@ def group_submissions_for_tickers(submissions: [Submission]) -> {str: {Submissio
 def notify_user_of_subscription(u: Redditor, tickers: [str]):
     u.message(
         "I've subscribed you to some tickers",
-        f'You\'ll be notified when DD/Discussions/Fundamentals are posted for {", ".join(tickers)}\n\n\n\n' +
+        f'You\'ll be notified when DD is posted for {", ".join(tickers)}\n\n\n\n' +
         'To stop subscriptions reply with a message like `stop $MSFT $AAPL`'
     )
 

@@ -28,6 +28,7 @@ Resources:
           Properties:
             Schedule: 'cron(0/15 * * * ? *)'
             Name: RunEveryFifteenMinutes
+            Input: !Sub "{\"version\": \"${Version}\"}"
             Description: Run every 15 minutes
       Tags:
         Version: !Ref Version
