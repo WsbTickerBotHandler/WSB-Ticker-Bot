@@ -1,6 +1,7 @@
 import re
 import os
 import logging
+import urllib.parse
 
 from praw.models import Redditor, Submission
 
@@ -67,39 +68,62 @@ def group_submissions_for_tickers(submissions: [Submission]) -> {str: {Submissio
 
 def notify_user_of_subscription(u: Redditor, tickers: [str]):
     u.message(
-        f'I\'ve subscribed you to DD posts',
-        f'You\'ll be notified when DD/Fundamentals/Discussions are posted for {", ".join(tickers)}\n\n\n\n' +
-        'To stop subscriptions, send me a message like \"stop $MSFT $AAPL\"'
+        "I've subscribed you to some tickers",
+        f'You\'ll be notified when DD/Discussions/Fundamentals are posted for {", ".join(tickers)}\n\n\n\n' +
+        'To stop subscriptions reply with a message like `stop $MSFT $AAPL`'
     )
 
 
 def notify_user_of_unsubscription(u: Redditor, tickers: [str]):
     u.message(
-        'I\'ve Unsubscribed you from DD',
-        f'I\'ve unsubscribed you from {", ".join(tickers)}'
+        "I've Unsubscribed you from some tickers",
+        f'You are no longer subscribed to {", ".join(tickers)}'
+    )
+
+
+def notify_user_of_all_subscription(u: Redditor):
+    u.message(
+        "I've subscribed you to all DD",
+        "You'll be notified when any new DD is posted\n\n\n\n" +
+        'To stop your subscription to all DD, reply `stop all`'
+    )
+
+
+def notify_user_of_all_unsubscription(u: Redditor):
+    u.message(
+        "I've unsubscribed you from the all DD feed",
+        "You'll still receive notifications for individual tickers which you are subscribed to"
     )
 
 
 def notify_user_of_error(u: Redditor):
-    with open(f'{os.path.dirname(__file__)}/resources/instructions.md') as f:
-        u.message(
-            "I couldn't understand you",
-            f'Hey {u.name}, try using these instructions:\n\n'
-            f'{f.read()}'
-        )
+    u.message(
+        "I couldn't understand you",
+        "[Try reading these instructions on how to use me](https://www.reddit.com/user/WSBStockTickerBot/comments/gt375p/how_to_use_me/)"
+    )
 
 
 def make_comment_from_tickers(tickers: [str]):
     return (
-        "I'm a bot, REEEEEEEEEEE\n\n"
-        f"I've identified these tickers in this submission: {', '.join(tickers)}\n\n"
-        "To be notified of future DD posts that include a particular ticker comment "
-        "with the ticker names and I'll message you when a DD post about that ticker is rising.\n\n"
-        "Example: $TSLA $AAPL"
+        "I'm a bot, REEEEEEE\n\n"
+        f"I've found these tickers in this submission: {' '.join([create_send_link_for_ticker(t) for t in tickers])}\n\n"
+        "I can notify you when DD is posted about these tickers in the future!\n\n"
+        f'Click on the ticker above to subscribe or click [here]({create_send_link_for_tickers(tickers)}) to be subscribed to all tickers in this post\n\n'
+        "Comment below or send me a private message (not a chat!) like `$TSLA $DEED` to subscribe to any other ticker as well\n\n"
+        "Read how to use me [here](https://www.reddit.com/user/WSBStockTickerBot/comments/gt375p/how_to_use_me/)"
     )
 
 
-def make_pretty_message(ticker_notifications: [{str: [Submission]}]) -> str:
+def create_send_link_for_ticker(ticker: str) -> str:
+    return f'[{ticker}](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message={ticker})'
+
+
+def create_send_link_for_tickers(tickers: [str]) -> str:
+    url_encoded_tickers = urllib.parse.quote(' '.join(tickers))
+    return f'https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message={url_encoded_tickers}'
+
+
+def make_pretty_message(ticker_notifications: [{}]) -> str:
     def make_title_links(submissions: [Submission]):
         title_links = ""
         for s in submissions:
@@ -108,6 +132,5 @@ def make_pretty_message(ticker_notifications: [{str: [Submission]}]) -> str:
 
     pretty_message = ""
     for n in ticker_notifications:
-        for ticker, subs in n.items():
-            pretty_message += f'## {ticker}:\n{make_title_links(subs)}\n\n'
+        pretty_message += f'## {n["ticker"]}:\n{make_title_links(n["subs"])}\n\n'
     return pretty_message

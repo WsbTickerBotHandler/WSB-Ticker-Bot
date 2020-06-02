@@ -12,9 +12,8 @@ def test_get_submissions(wsb_reddit_client):
 
 
 @pytest.mark.integration
-def test_get_tickers_for_submissions(wsb_reddit_client):
-    submissions = wsb_reddit_client.get_submissions(5)
-    [logger.info((s.id, get_tickers_for_submission(s))) for s in submissions]
+def test_get_tickers_for_submissions(wsb_reddit_client, a_submission):
+    logger.info(get_tickers_for_submission(a_submission))
 
 
 @pytest.mark.integration

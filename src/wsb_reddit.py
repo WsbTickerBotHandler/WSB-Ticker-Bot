@@ -1,10 +1,10 @@
 from typing import Union
 import logging
 import concurrent.futures
-from database import *
+from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
 from wsb_reddit_utils import *
 from praw.reddit import Reddit
-from praw.models import *
+from praw.models import Message, Comment
 from stock_data.tickers import tickers as tickers_set
 
 logger = logging.getLogger()
@@ -37,7 +37,7 @@ class WSBReddit:
         self.notify_users(tickers_with_submissions)
 
     def get_submissions(self, limit, flair_filter=False) -> [Submission]:
-        valid_flairs = {'DD', 'Fundamentals', 'Discussion'}
+        valid_flairs = {'DD', 'Discussion', 'Fundamentals'}
         # valid_flairs = {'DD'}
         subs = self.wsb.new(limit=limit)
         if flair_filter:
@@ -60,26 +60,43 @@ class WSBReddit:
     def notify_users(self, tickers_with_submissions: {str: [Submission]}):
         notifications = dict()
         notified_tickers = set()
+        users_subscribed_to_all: [str] = self.database.get_users_subscribed_to_all_dd_feed()
 
         len(tickers_with_submissions) > 0 and logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)})')
         for ticker, subs in tickers_with_submissions.items():
             logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
             if len(users_to_notify) > 0:
-                logger.info(f'Notifying {len(users_to_notify)} users about ticker {ticker}')
+                logger.info(f'Will notify {len(users_to_notify)} users about ticker {ticker}')
                 notified_tickers.add(ticker)
+            for u in users_subscribed_to_all:
+                if u in notifications:
+                    notifications[u].append({'ticker': ticker, 'subs': [s for s in subs if s.link_flair_text == "DD"]})
+                else:
+                    notifications[u] = [{'ticker': ticker, 'subs': [s for s in subs if s.link_flair_text == "DD"]}]
+
             for u in users_to_notify:
                 if u in notifications:
-                    notifications[u].append({ticker: subs})
+                    notifications[u].append({'ticker': ticker, 'subs': subs})
                 else:
-                    notifications[u] = [{ticker: subs}]
+                    notifications[u] = [{'ticker': ticker, 'subs': subs}]
+
+        # Ensure there are no duplicates in a user's notifications from the all DD subscription +
+        # an individual subscription
+        for u, notify_about_these in notifications.items():
+            notifications[u] = list({v['ticker']: v for v in notify_about_these}.values())
+
+        logger.info(notifications)
 
         def notify(notification):
-            user_to_notify, notify_about_these = notification
-            self.get_another_reddit_instance().redditor(user_to_notify).message(
-                'New DD posted!',
-                make_pretty_message(notify_about_these)
-            )
+            try:
+                user_to_notify, notify_about_these_subs = notification
+                self.get_another_reddit_instance().redditor(user_to_notify).message(
+                    'New DD posted!',
+                    make_pretty_message(notify_about_these_subs)
+                )
+            except Exception as e:
+                logger.error(f'Notification of user {users_to_notify} ran into an error: {e}')
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             executor.map(notify, notifications.items())
@@ -91,6 +108,12 @@ class WSBReddit:
         author: Redditor = item.author
         tickers: [str] = parse_tickers_from_text(body)
 
+        if body.lower() == "all dd":
+            self.database.subscribe_user_to_all_dd_feed(author.name)
+            notify_user_of_all_subscription(author)
+        if body.lower() == "stop all":
+            self.database.unsubscribe_user_from_all_dd_feed(author.name)
+            notify_user_of_all_unsubscription()
         if len(tickers) == 0 and not item.was_comment:
             logger.info(f'User {author} submitted uninterpretable message: {body}')
             notify_user_of_error(author)

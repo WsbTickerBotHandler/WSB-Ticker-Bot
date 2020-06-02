@@ -88,3 +88,39 @@ class Database:
             return True
         except KeyError:
             return False
+
+    def subscribe_user_to_all_dd_feed(self, user_name: str):
+        self.client.put_item(
+            TableName='all-dd-subscribers',
+            Item={
+                'user_name': {'S': user_name}
+            },
+            ReturnValues='NONE'
+        )
+
+    def unsubscribe_user_from_all_dd_feed(self, user_name: str):
+        self.client.delete_item(
+            TableName='all-dd-subscribers',
+            Key={
+                'user_name': {'S': user_name}
+            },
+            ReturnValues='NONE'
+        )
+
+    def is_user_subscribed_to_all_dd_feed(self, user_name: str):
+        try:
+            self.client.get_item(
+                TableName='all-dd-subscribers',
+                Key={
+                    'user_name': {'S': user_name}
+                }
+            )['Item']
+            return True
+        except KeyError:
+            return False
+
+    def get_users_subscribed_to_all_dd_feed(self) -> [str]:
+        try:
+            return [i['user_name']['S'] for i in self.client.scan(TableName='all-dd-subscribers')['Items']]
+        except KeyError:
+            return []

@@ -42,17 +42,21 @@ def test_parse_tickers_from_text():
     assert parse_tickers_from_text(text) == expected_out
 
 
-def test_make_comment_from_tickers():
-    expected_coment = (
-        "I'm a bot, REEEEEEEEEEE\n\n"
-        "I've identified these tickers in this submission: $SPY, $TSLA, $AAPL\n\n"
-        "To be notified of future DD posts that include a particular ticker comment "
-        "with the ticker names and I'll message you when a DD post about that ticker is rising.\n\n"
-        "Example: $TSLA $AAPL"
-    )
-    assert make_comment_from_tickers(["$SPY", "$TSLA", "$AAPL"]) == expected_coment
+def test_make_comment_from_tickers(a_user: Redditor):
+    msg = make_comment_from_tickers(["$SPY", "$TSLA", "$AAPL"])
+    a_user.message("test_make_comment_from_tickers", msg)
 
 
 @pytest.mark.integration
-def test_notify_user_of_error(a_submission, a_user: Redditor):
+def test_notify_user_of_error(a_user: Redditor):
     notify_user_of_error(a_user)
+
+
+@pytest.mark.integration
+def test_notify_user_of_subscription(a_user: Redditor):
+    notify_user_of_subscription(a_user, ["$BBWG", "$DDDD"])
+
+
+@pytest.mark.integration
+def test_notify_user_of_all_subscription(a_user: Redditor):
+    notify_user_of_all_subscription(a_user)
