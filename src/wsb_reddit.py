@@ -115,7 +115,7 @@ class WSBReddit:
         for chunk in chunks(notifications):
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.map(notify, chunk.items())
-            time.sleep(1)
+            time.sleep(.5)
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
