@@ -103,7 +103,7 @@ class WSBReddit:
             except Exception as e:
                 logger.error(f'Notification of user {users_to_notify} ran into an error: {e}')
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             executor.map(notify, notifications.items())
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
