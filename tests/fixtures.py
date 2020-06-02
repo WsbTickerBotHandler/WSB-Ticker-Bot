@@ -14,7 +14,7 @@ def a_submission(wsb_reddit_client) -> Submission:
     # Personal test submission
     # yield wsb_reddit_client.reddit.submission(id='gn18pl')
     # A DD submission with a few tickers mentioned
-    yield wsb_reddit_client.reddit.submission(id='guwpiv')
+    yield wsb_reddit_client.reddit.submission(id='gv8nj1')
 
 
 @pytest.fixture(scope="session")

@@ -66,14 +66,19 @@ class WSBReddit:
         for ticker, subs in tickers_with_submissions.items():
             logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
             users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
-            if len(users_to_notify) > 0:
-                logger.info(f'Will notify {len(users_to_notify)} users about ticker {ticker}')
+            unique_users_to_notify = set(users_subscribed_to_all + users_to_notify)
+            if len(unique_users_to_notify) > 0:
+                logger.info(f'Will notify {len(unique_users_to_notify)} users about ticker {ticker}')
                 notified_tickers.add(ticker)
             for u in users_subscribed_to_all:
                 if u in notifications:
-                    notifications[u].append({'ticker': ticker, 'subs': [s for s in subs if s.link_flair_text == "DD"]})
+                    for s in subs:
+                        if s.link_flair_text == 'DD':
+                            notifications[u].append({'ticker': ticker, 'subs': subs})
                 else:
-                    notifications[u] = [{'ticker': ticker, 'subs': [s for s in subs if s.link_flair_text == "DD"]}]
+                    for s in subs:
+                        if s.link_flair_text == 'DD':
+                            notifications[u] = [{'ticker': ticker, 'subs': subs}]
 
             for u in users_to_notify:
                 if u in notifications:
@@ -86,7 +91,7 @@ class WSBReddit:
         for u, notify_about_these in notifications.items():
             notifications[u] = list({v['ticker']: v for v in notify_about_these}.values())
 
-        logger.info(notifications)
+        logger.debug(f'Notifications object: {notifications}')
 
         def notify(notification):
             try:
