@@ -45,7 +45,7 @@ class WSBReddit:
         valid_flairs = {'DD'}
         subs = self.wsb.new(limit=limit)
         if flair_filter:
-            return [s for s in subs if s.link_flair_text in valid_flairs]
+            return [s for s in subs if s.link_flair_text in valid_flairs and len(s.selftext) > 500]
         else:
             return [s for s in subs]
 
