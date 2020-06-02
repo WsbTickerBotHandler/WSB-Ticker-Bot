@@ -97,7 +97,7 @@ class WSBReddit:
 
         logger.debug(f'Notifications object: {notifications}')
 
-        def chunks(data, size=9):
+        def chunks(data, size=60):
             it = iter(data)
             for i in range(0, len(data), size):
                 yield {k: data[k] for k in islice(it, size)}
@@ -113,9 +113,14 @@ class WSBReddit:
                 logger.error(f'Notification of user {users_to_notify} ran into an error: {e}')
 
         for chunk in chunks(notifications):
+            start_time = time.time()
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.map(notify, chunk.items())
-            time.sleep(.5)
+            time_taken = (time.time() - start_time)
+            sleep_for = 61 - time_taken
+            logger.info(f'Took {int(time_taken)} seconds to notify 50 users, sleeping for {sleep_for} seconds')
+            # Reddit limits us to 60 requests/min so wait 1 min before making 50 more requests
+            time.sleep(sleep_for)
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 

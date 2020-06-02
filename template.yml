@@ -14,7 +14,7 @@ Resources:
       Runtime: python3.8
       CodeUri: src/.
       Description: Run the WSB Ticker Bot
-      Timeout: 240
+      Timeout: 900
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -26,7 +26,7 @@ Resources:
         ScheduledRun:
           Type: Schedule
           Properties:
-            Schedule: 'cron(0/5 * * * ? *)'
+            Schedule: 'cron(0/15 * * * ? *)'
             Name: RunEveryFifteenMinutes
             Input: !Sub "{\"version\": \"${Version}\"}"
             Description: Run every 15 minutes
