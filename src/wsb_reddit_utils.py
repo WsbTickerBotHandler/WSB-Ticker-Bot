@@ -115,12 +115,12 @@ def make_comment_from_tickers(tickers: [str]):
 
 
 def create_send_link_for_ticker(ticker: str) -> str:
-    return f'[{ticker}](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message={ticker})'
+    return f'[{ticker}](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message={ticker})'
 
 
 def create_send_link_for_tickers(tickers: [str]) -> str:
     url_encoded_tickers = urllib.parse.quote(' '.join(tickers))
-    return f'https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subcribe%20Me&message={url_encoded_tickers}'
+    return f'https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message={url_encoded_tickers}'
 
 
 def make_pretty_message(ticker_notifications: [{}]) -> str:
