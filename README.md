@@ -13,9 +13,9 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
 Or...
 
 * Send [/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) a message or comment on something it's posted. **Chat is not supported by Reddit for bots please make sure you send a DM or respond to a [/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) comment**
-  * Example: `$AAPL $UCO` will subscribe you to the `$AAPL` and `$UCO` tickers
+  * Example: `$ESGV $UCO $GE` will subscribe you to the `$ESGV`, `$UCO` and `$GE` tickers
 * Use a message with stop at the beginning to be unsubscribed from specific tickers
-  * Example: `STOP $AAPL`
+  * Example: `STOP $UCO $GE`
 * Use `STOP ALL` to unsubscribe from the "ALL DD" feed
 
 ## A couple things to know
