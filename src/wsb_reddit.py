@@ -4,9 +4,12 @@ import logging
 import concurrent.futures
 
 from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
-from wsb_reddit_utils import *
+from wsb_reddit_utils import (make_pretty_message, chunks, get_tickers_for_submission, make_comment_from_tickers,
+                              reply_to, parse_tickers_from_text, create_error_notification,
+                              create_subscription_notification, create_unsubscription_notification,
+                              create_all_subscription_notification, create_all_unsubscription_notification)
 from praw.reddit import Reddit
-from praw.models import Message, Comment
+from praw.models import Message, Comment, Submission, Redditor
 from stock_data.tickers import tickers as tickers_set
 
 logger = logging.getLogger()
@@ -136,25 +139,25 @@ class WSBReddit:
         if body.lower() == "all dd":
             self.database.subscribe_user_to_all_dd_feed(author.name)
             logger.info(f'User {author} requested subscription to all DD')
-            notify_user_of_all_subscription(author)
+            reply_to(item, create_all_subscription_notification())
         elif body.lower() == "stop all":
             logger.info(f'User {author} requested unsubscription from all DD')
             self.database.unsubscribe_user_from_all_dd_feed(author.name)
-            notify_user_of_all_unsubscription(author)
+            reply_to(item, create_all_unsubscription_notification())
         elif len(tickers) == 0 and not item.was_comment:
             logger.info(f'User {author} submitted uninterpretable message: {body}')
-            notify_user_of_error(author)
+            reply_to(item, create_error_notification())
         elif len(tickers) == 0 and item.was_comment:
             item.mark_read()
             return
         elif body.lower().startswith("stop"):
             logger.info(f'User {author} requested unsubscription from {tickers}')
             [self.database.unsubscribe_user_from_ticker(author.name, ticker) for ticker in tickers]
-            notify_user_of_unsubscription(author, tickers)
+            reply_to(item, create_unsubscription_notification(tickers))
         else:
             logger.info(f'User {author} requested subscription to {tickers}')
             [self.database.subscribe_user_to_ticker(author.name, ticker) for ticker in tickers]
-            notify_user_of_subscription(author, tickers)
+            reply_to(item, create_subscription_notification(tickers))
 
         item.mark_read()
 

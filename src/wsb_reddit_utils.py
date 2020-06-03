@@ -1,4 +1,6 @@
 import re
+from typing import Union
+from praw.models import Message, Comment
 import os
 from itertools import islice
 import logging
@@ -69,56 +71,50 @@ def group_submissions_for_tickers(submissions: [Submission]) -> {str: {Submissio
     return tickers_submissions
 
 
-def notify_user_of_subscription(u: Redditor, tickers: [str]):
-    u.message(
-        "I've subscribed you to some tickers",
-        f'You\'ll be notified when DD is posted for {", ".join(tickers)}\n\n\n\n' +
+def reply_to(item: Union[Message, Comment], message: str):
+    item.reply(message)
+
+
+def create_subscription_notification(tickers: [str]):
+    return f'You\'ll be notified when DD is posted for {", ".join(tickers)}\n\n\n\n' +\
         'To stop subscriptions reply with a message like `stop $MSFT $AAPL`'
-    )
 
 
-def notify_user_of_unsubscription(u: Redditor, tickers: [str]):
-    u.message(
-        "I've Unsubscribed you from some tickers",
-        f'You are no longer subscribed to {", ".join(tickers)}'
-    )
+def create_unsubscription_notification(tickers: [str]):
+    return f'You are no longer subscribed to {", ".join(tickers)}'
 
 
-def notify_user_of_all_subscription(u: Redditor):
+def create_all_subscription_notification():
     # u.message(
     #     "I've subscribed you to all DD",
     #     "You'll be notified when any new DD is posted\n\n\n\n" +
     #     'To stop your subscription to all DD, reply `stop all`'
     # )
     ticker = random.choice(tuple(tickers_set))
-    u.message(
-        "The ALL DD feed is temporarily disabled",
-        "You'll still be subscribed, but you won't receive notifications until it's re-enabled\n\n\n\n" +
+    return "The ALL DD feed is temporarily disabled\n\n" +\
+        "You'll still be subscribed, but you won't receive notifications until it's re-enabled\n\n\n\n" +\
         f'In the meantime, you can subscribe to DD for specific tickers [here](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=%20%24{ticker})'
-    )
 
 
-def notify_user_of_all_unsubscription(u: Redditor):
-    u.message(
-        "I've unsubscribed you from the all DD feed",
+def create_all_unsubscription_notification():
+    return "I've unsubscribed you from the all DD feed\n\n" +\
         "You'll still receive notifications for individual tickers which you are subscribed to"
-    )
 
 
-def notify_user_of_error(u: Redditor):
-    u.message(
-        "I couldn't understand you",
+def create_error_notification():
+    return "I couldn't understand what you sent\n\n" +\
         "[Try reading these instructions on how to use me](https://www.reddit.com/user/WSBStockTickerBot/comments/gt375p/how_to_use_me/)"
-    )
 
 
 def make_comment_from_tickers(tickers: [str]):
+    ticker = random.choice(tuple(tickers_set))
+    ticker2 = random.choice(tuple(tickers_set))
     return (
         "I'm a bot, REEEEEEE\n\n"
         f"I've found these tickers in this submission: {' '.join([create_send_link_for_ticker(t) for t in tickers])}\n\n"
         "I can notify you when DD is posted about these tickers in the future!\n\n"
         f'Click on the ticker above to subscribe or click [here]({create_send_link_for_tickers(tickers)}) to be subscribed to all tickers in this post\n\n'
-        "Comment below or send me a private message (not a chat!) like `$TSLA $DEED` to subscribe to any other ticker as well\n\n"
+        f"Comment below or send me a private message (not a chat!) like `${ticker} ${ticker2}` to subscribe to other tickers\n\n"
         "Read how to use me [here](https://www.reddit.com/user/WSBStockTickerBot/comments/gt375p/how_to_use_me/)"
     )
 

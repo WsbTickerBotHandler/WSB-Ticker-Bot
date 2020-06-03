@@ -1,7 +1,6 @@
 import logging
 from fixtures import *
-from wsb_reddit_utils import get_tickers_for_submission
-
+from wsb_reddit_utils import get_tickers_for_submission, create_error_notification, create_subscription_notification, create_all_subscription_notification
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -43,3 +42,18 @@ def test_process_submissions(wsb_reddit_client, a_submission):
     start_time = time.time()
     wsb_reddit_client.process_submissions([a_submission], reprocess=True)
     logger.info("--- %s seconds ---" % (time.time() - start_time))
+
+
+@pytest.mark.integration
+def test_notify_user_of_error(a_user: Redditor):
+    create_error_notification()
+
+
+@pytest.mark.integration
+def test_notify_user_of_subscription(a_user: Redditor):
+    create_subscription_notification(["$BBWG", "$DDDD"])
+
+
+@pytest.mark.integration
+def test_notify_user_of_all_subscription(a_user: Redditor):
+    create_all_subscription_notification()
