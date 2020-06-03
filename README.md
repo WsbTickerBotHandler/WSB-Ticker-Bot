@@ -21,11 +21,9 @@ Or...
 ## A couple things to know
 * If you subscribed to an individual ticker you'll be notified of new posts with the `DD` flair for that ticker
 * If you subscribed to the "ALL DD" feed, you'll be notified of all new `DD` flaired posts 
-
-## Need some help
-* Currently, the bot can be rate-limited when making posts. If you can give the bot some orange arrows would help. I'd like to have the bot post on rising DD-flaired posts with the tickers it finds in them to help other people find and use it
-* If you find any issues or have a suggestion or feature you'd like to see, send a message to [/u/WSBTickerBotHandler](https://www.reddit.com/user/WSBTickerBotHandler) or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
 * Stopping your "ALL DD" subscription will not stop individual tickers you've subscribed to separately
+
+* If you find any issues or have a suggestion or feature you'd like to see, send a message to [/u/WSBTickerBotHandler](https://www.reddit.com/user/WSBTickerBotHandler) or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
 
 ---
 

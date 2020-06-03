@@ -120,7 +120,7 @@ class WSBReddit:
         remaining_chunks_to_process = len(chunked_notifications)
         for chunk in chunked_notifications:
             start_time = time.time()
-            with ThreadPoolExecutor(max_workers=3) as executor:
+            with ThreadPoolExecutor(max_workers=6) as executor:
                 executor.map(notify, chunk.items())
             time_taken = (time.time() - start_time)
             sleep_for = 61 - time_taken
