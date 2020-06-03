@@ -6,7 +6,7 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
 **[/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) scans [/r/wsb](https://www.reddit.com/r/wallstreetbets/ "WSB")'s new posts and will notify you when DD is being posted about tickers you're interested in**
 
 ## How to use
-**EASY>>** [CLICK HERE TO SUBSCRIBE TO A TICKER(S)!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=You%27ll%20be%20subscribed%20to%20%24MSFT%20and%20%24AAPL%20as%20an%20example%0AType%20more%20tickers%20anywhere%20and%2For%20erase%20the%20line%20above%20if%20you%20don%27t%20want%20those) **<<EASY**
+**EASY>>** [CLICK HERE TO SUBSCRIBE TO A TICKER(S)!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=Type%20tickers%20%24LIKE%20%24THIS%20anywhere%20in%20this%20message%20to%20subscribe%20to%20them) **<<EASY**
 
 **EASY>>** [CLICK HERE TO SUBSCRIBE TO ALL NEW DD!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=ALL%20DD) **<<EASY**
 

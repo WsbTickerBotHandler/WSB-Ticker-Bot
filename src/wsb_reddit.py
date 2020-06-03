@@ -45,7 +45,7 @@ class WSBReddit:
         valid_flairs = {'DD'}
         subs = self.wsb.new(limit=limit)
         if flair_filter:
-            return [s for s in subs if s.link_flair_text in valid_flairs and len(s.selftext) > 300]
+            return [s for s in subs if s.link_flair_text in valid_flairs and len(s.selftext) > 100]
         else:
             return [s for s in subs]
 
@@ -110,7 +110,7 @@ class WSBReddit:
                 logger.error(f'Notification of user {users_to_notify} ran into an error: {e}')
 
         chunked_notifications = chunks(notifications, size=MAX_USERS_TO_NOTIFY_PER_CHUNK)
-        remaining_chunks_to_process = len(chunked_notifications)
+        remaining_chunks_to_process = len(list(chunked_notifications))
         for chunk in chunked_notifications:
             start_time = time.time()
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:

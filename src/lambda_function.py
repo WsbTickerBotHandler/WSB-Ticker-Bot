@@ -4,7 +4,6 @@ from wsb_reddit import *
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# Grab 2 DD submissions per run
 DEFAULT_SUBMISSION_LIMIT = 30
 DEFAULT_REPROCESS = False
 
