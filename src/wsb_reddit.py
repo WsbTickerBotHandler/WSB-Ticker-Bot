@@ -28,7 +28,9 @@ class WSBReddit:
 
     def process_inbox(self):
         num_processed = 0
-        for message in self.reddit.inbox.unread(limit=50):
+        messages = list(self.reddit.inbox.unread(limit=50))
+        messages.reverse()
+        for message in messages:
             self.handle_message(message)
             num_processed += 1
         num_processed > 0 and logger.info(f'Processed {num_processed} user messages')
