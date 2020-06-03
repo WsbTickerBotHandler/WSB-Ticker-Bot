@@ -76,8 +76,9 @@ def reply_to(item: Union[Message, Comment], message: str):
 
 
 def create_subscription_notification(tickers: [str]):
+    tickers_for_stop_example = random.choices(tickers, k=2) if len(tickers) > 1 else tickers[:1]
     return f'You\'ll be notified when DD is posted for {", ".join(tickers)}\n\n\n\n' +\
-        'To stop subscriptions reply with a message like `stop $MSFT $AAPL`'
+        f'To stop subscriptions reply with a message like `stop {" ".join(tickers_for_stop_example)}`'
 
 
 def create_unsubscription_notification(tickers: [str]):
