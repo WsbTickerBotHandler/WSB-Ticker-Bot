@@ -13,7 +13,7 @@ from stock_data.tickers import tickers as tickers_set
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-MAX_TICKERS = 10
+MAX_TICKERS = 30
 # These will be excluded unless there is a $ before them
 TICKER_EXCLUSIONS = ["OTM", "ITM", "ATM", "ATH", "MACD", "ROI", "GAIN", "LOSS", "TLDR", "CEO", "WSB", "EOD", "YTD",
                      "LLC", "IMO", "CEO", "CFO", "FBI", "SEC", "THE", "NYSE", "USA", "IMF", "AND", "BABY", "EST", "PDT",
