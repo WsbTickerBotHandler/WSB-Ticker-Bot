@@ -128,7 +128,7 @@ class WSBReddit:
             remaining_chunks_to_process -= 1
             # Reddit limits us to 60 requests/min so wait 1 min before making 60 more requests
             if remaining_chunks_to_process > 0:
-                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users. Sleeping for {sleep_for} seconds...')
+                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users. Sleeping for {int(sleep_for)} seconds...')
                 time.sleep(sleep_for)
             else:
                 logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users')
