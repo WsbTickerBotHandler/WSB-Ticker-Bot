@@ -130,7 +130,7 @@ class WSBReddit:
                 logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users. Sleeping for {sleep_for} seconds...')
                 time.sleep(sleep_for)
             else:
-                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())}')
+                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users')
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
