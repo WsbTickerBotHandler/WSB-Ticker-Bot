@@ -7,7 +7,8 @@ from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMIS
 from wsb_reddit_utils import (make_pretty_message, chunks, get_tickers_for_submission, make_comment_from_tickers,
                               reply_to, parse_tickers_from_text, create_error_notification,
                               create_subscription_notification, create_unsubscription_notification,
-                              create_all_subscription_notification, create_all_unsubscription_notification)
+                              create_all_subscription_notification, create_all_unsubscription_notification
+                              )
 from praw.reddit import Reddit
 from praw.models import Message, Comment, Submission, Redditor
 from stock_data.tickers import tickers as tickers_set
@@ -135,11 +136,15 @@ class WSBReddit:
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
     def handle_message(self, item: Union[Message, Comment]):
+        MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE = 10
         body: str = item.body
         author: Redditor = item.author
         tickers = [ticker for ticker in parse_tickers_from_text(body) if ticker.strip('$') in tickers_set]
 
-        if body.lower() == "all dd":
+        if len(tickers) > MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE:
+            logger.info(f'User {author} requested subscription to more than {MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE} tickers')
+            reply_to(item, "You can only subscribe to 10 tickers at once")
+        elif body.lower() == "all dd":
             self.database.subscribe_user_to_all_dd_feed(author.name)
             logger.info(f'User {author} requested subscription to all DD')
             reply_to(item, create_all_subscription_notification())
