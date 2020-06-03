@@ -103,6 +103,7 @@ def create_all_unsubscription_notification():
 
 def create_error_notification():
     return "I couldn't understand what you sent\n\n" +\
+        "Be sure to include at least one real ticker in your message\n\n" +\
         "[Try reading these instructions on how to use me](https://www.reddit.com/user/WSBStockTickerBot/comments/gt375p/how_to_use_me/)"
 
 

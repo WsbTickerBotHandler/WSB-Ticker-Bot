@@ -135,7 +135,7 @@ class WSBReddit:
     def handle_message(self, item: Union[Message, Comment]):
         body: str = item.body
         author: Redditor = item.author
-        tickers: [str] = parse_tickers_from_text(body)
+        tickers = [ticker for ticker in parse_tickers_from_text(body) if ticker.strip('$') in tickers_set]
 
         if body.lower() == "all dd":
             self.database.subscribe_user_to_all_dd_feed(author.name)
