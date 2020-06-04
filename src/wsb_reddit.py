@@ -107,14 +107,14 @@ class WSBReddit:
         logger.debug(f'Notifications object: {notifications}')
 
         def notify(notification):
+            user_to_notify, notify_about_these_subs = notification
             try:
-                user_to_notify, notify_about_these_subs = notification
                 self.get_another_reddit_instance().redditor(user_to_notify).message(
                     'New DD posted!',
                     make_pretty_message(notify_about_these_subs)
                 )
             except Exception as e:
-                logger.error(f'Notification of user {users_to_notify} ran into an error: {e}')
+                logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
 
         chunked_notifications = list(chunks(notifications, size=MAX_USERS_TO_NOTIFY_PER_CHUNK))
         remaining_chunks_to_process = len(chunked_notifications)
