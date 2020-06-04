@@ -104,7 +104,7 @@ class WSBReddit:
         for u, notify_about_these in notifications.items():
             notifications[u] = list({v['ticker']: v for v in notify_about_these}.values())
         # Process largest notifications first so it fails if it can't be done
-        sorted_notification = sorted(notifications, key=lambda k: len(notifications[k]), reverse=True)
+        sorted_notification = {k: v for k, v in sorted(notifications.items(), key=lambda x: len(x), reverse=True)}
         logger.debug(f'Notifications object: {sorted_notification}')
 
         def notify(notification):
