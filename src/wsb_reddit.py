@@ -123,16 +123,16 @@ class WSBReddit:
             with ThreadPoolExecutor(max_workers=6) as executor:
                 executor.map(notify, chunk.items())
             time_taken = (time.time() - start_time)
-            # sleep_for = 61 - time_taken
+            sleep_for = 61 - time_taken
 
             remaining_chunks_to_process -= 1
-            logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users, {remaining_chunks_to_process} chunks of users left to process')
+            # logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users, {remaining_chunks_to_process} chunks of users left to process')
             # Reddit limits us to 60 requests/min so wait 1 min before making 60 more requests
-            # if remaining_chunks_to_process > 0:
-            #     logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users. Sleeping for {int(sleep_for)} seconds...')
-            #     time.sleep(sleep_for)
-            # else:
-            #     logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users')
+            if remaining_chunks_to_process > 0:
+                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users. Sleeping for {int(sleep_for)} seconds...')
+                time.sleep(sleep_for)
+            else:
+                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users')
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
 
