@@ -103,8 +103,9 @@ class WSBReddit:
         # an individual subscription
         for u, notify_about_these in notifications.items():
             notifications[u] = list({v['ticker']: v for v in notify_about_these}.values())
-
-        logger.debug(f'Notifications object: {notifications}')
+        # Process largest notifications first so it fails if it can't be done
+        sorted_notification = sorted(notifications, key=lambda k: len(notifications[k]), reverse=True)
+        logger.debug(f'Notifications object: {sorted_notification}')
 
         def notify(notification):
             user_to_notify, notify_about_these_subs = notification
@@ -116,7 +117,7 @@ class WSBReddit:
             except Exception as e:
                 logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
 
-        chunked_notifications = list(chunks(notifications, size=MAX_USERS_TO_NOTIFY_PER_CHUNK))
+        chunked_notifications = list(chunks(sorted_notification, size=MAX_USERS_TO_NOTIFY_PER_CHUNK))
         remaining_chunks_to_process = len(chunked_notifications)
         for chunk in chunked_notifications:
             start_time = time.time()
@@ -134,7 +135,7 @@ class WSBReddit:
             else:
                 logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users')
 
-        len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users about {len(notified_tickers)} tickers')
+        len(sorted_notification) > 0 and logger.info(f'Notified {len(sorted_notification)} users about {len(notified_tickers)} tickers')
 
     def handle_message(self, item: Union[Message, Comment]):
         MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE = 10

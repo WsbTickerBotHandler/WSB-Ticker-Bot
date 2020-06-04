@@ -57,3 +57,20 @@ def test_notify_user_of_subscription(a_user: Redditor):
 @pytest.mark.integration
 def test_notify_user_of_all_subscription(a_user: Redditor):
     create_all_subscription_notification()
+
+
+@pytest.mark.integration
+def test_notify_some_users_of_something(wsb_reddit_client):
+    us = []
+
+    def create_notification(user: str):
+        try:
+            wsb_reddit_client.reddit.redditor(user).message(
+                'Subject',
+                'Message'
+            )
+            logger.info(f'Notified {user}')
+        except Exception as e:
+            logger.error(f'Could not send {user} a message: {e}')
+
+    [create_notification(u) for u in us]
