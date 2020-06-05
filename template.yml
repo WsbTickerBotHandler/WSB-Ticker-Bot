@@ -26,10 +26,10 @@ Resources:
         ScheduledRun:
           Type: Schedule
           Properties:
-            Schedule: 'cron(0/15 * * * ? *)'
-            Name: RunEveryFifteenMinutes
+            Schedule: 'cron(0/5 * * * ? *)'
+            Name: RunEveryFiveMinutes
             Input: !Sub "{\"version\": \"${Version}\"}"
-            Description: Run every 15 minutes
+            Description: Run every 5 minutes
       Tags:
         Version: !Ref Version
 
