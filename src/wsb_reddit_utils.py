@@ -74,7 +74,10 @@ def group_submissions_for_tickers(submissions: [Submission]) -> {str: {Submissio
 
 
 def reply_to(item: Union[Message, Comment], message: str):
-    item.reply(message)
+    try:
+        item.reply(message)
+    except Exception as e:
+        logger.error(f"There was an error responding to user {item.author}'s message with id {item.id}: {e} ")
 
 
 def create_subscription_notification(tickers: [str]):
