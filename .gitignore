@@ -1,7 +1,7 @@
 .idea/
 */__pycache__/
 *.pyc
-package/*
+deployment/package
 bucket-name.txt
 out.yml
 praw.ini
