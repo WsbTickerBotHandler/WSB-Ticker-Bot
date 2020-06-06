@@ -142,7 +142,12 @@ class WSBReddit:
         MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE = 10
         body: str = item.body
         author: Redditor = item.author
+
+        if author.name == "reddit":
+            item.mark_read()
+            return
         tickers = [ticker for ticker in parse_tickers_from_text(body) if ticker.strip('$') in tickers_set]
+
         is_old_enough = is_account_old_enough(author)
 
         if len(tickers) > MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE and is_old_enough:
