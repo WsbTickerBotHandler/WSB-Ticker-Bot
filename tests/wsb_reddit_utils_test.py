@@ -45,3 +45,8 @@ def test_parse_tickers_from_text():
 def test_make_comment_from_tickers(a_user: Redditor):
     msg = make_comment_from_tickers(["$SPY", "$TSLA", "$AAPL"])
     a_user.message("test_make_comment_from_tickers", msg)
+
+
+@pytest.mark.integration
+def test_account_is_older_than(a_user: Redditor):
+    assert is_account_old_enough(a_user) is True

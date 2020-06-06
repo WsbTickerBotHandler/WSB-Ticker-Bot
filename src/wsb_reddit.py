@@ -8,7 +8,8 @@ from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMIS
 from wsb_reddit_utils import (make_pretty_message, chunks, get_tickers_for_submission, make_comment_from_tickers,
                               reply_to, parse_tickers_from_text, create_error_notification,
                               create_subscription_notification, create_unsubscription_notification,
-                              create_all_subscription_notification, create_all_unsubscription_notification)
+                              create_all_subscription_notification, create_all_unsubscription_notification,
+                              is_account_old_enough, create_user_not_old_enough)
 from praw.reddit import Reddit
 from praw.models import Message, Comment, Submission, Redditor
 from stock_data.tickers import tickers as tickers_set
@@ -142,19 +143,20 @@ class WSBReddit:
         body: str = item.body
         author: Redditor = item.author
         tickers = [ticker for ticker in parse_tickers_from_text(body) if ticker.strip('$') in tickers_set]
+        is_old_enough = is_account_old_enough(author)
 
-        if len(tickers) > MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE:
+        if len(tickers) > MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE and is_old_enough:
             logger.info(f'User {author} requested subscription to more than {MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE} tickers')
             reply_to(item, "You can only subscribe to 10 tickers at once")
-        elif body.lower() == "all dd":
+        elif body.lower() == "all dd" and is_old_enough:
             self.database.subscribe_user_to_all_dd_feed(author.name)
             logger.info(f'User {author} requested subscription to all DD')
             reply_to(item, create_all_subscription_notification())
-        elif body.lower() == "stop all":
+        elif body.lower() == "stop all" and is_old_enough:
             logger.info(f'User {author} requested unsubscription from all DD')
             self.database.unsubscribe_user_from_all_dd_feed(author.name)
             reply_to(item, create_all_unsubscription_notification())
-        elif len(tickers) == 0 and not item.was_comment:
+        elif len(tickers) == 0 and not item.was_comment and is_old_enough:
             logger.info(f'User {author} submitted uninterpretable message: {body}')
             reply_to(item, create_error_notification())
         elif len(tickers) == 0 and item.was_comment:
@@ -164,10 +166,13 @@ class WSBReddit:
             logger.info(f'User {author} requested unsubscription from {tickers}')
             [self.database.unsubscribe_user_from_ticker(author.name, ticker) for ticker in tickers]
             reply_to(item, create_unsubscription_notification(tickers))
-        else:
+        elif is_old_enough:
             logger.info(f'User {author} requested subscription to {tickers}')
             [self.database.subscribe_user_to_ticker(author.name, ticker) for ticker in tickers]
             reply_to(item, create_subscription_notification(tickers))
+        else:
+            logger.info(f'User {author} has an account which is not old enough to use the bot')
+            reply_to(item, create_user_not_old_enough())
 
         item.mark_read()
 

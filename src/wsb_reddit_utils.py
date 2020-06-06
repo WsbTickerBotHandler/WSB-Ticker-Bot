@@ -1,6 +1,7 @@
 import re
 from typing import Union
 from praw.models import Message, Comment
+from datetime import datetime, timedelta
 import os
 from itertools import islice
 import logging
@@ -13,6 +14,7 @@ from stock_data.tickers import tickers as tickers_set
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+DEFAULT_ACCOUNT_AGE = 15
 MAX_TICKERS = 30
 # These will be excluded unless there is a $ before them
 TICKER_EXCLUSIONS = ["OTM", "ITM", "ATM", "ATH", "MACD", "ROI", "GAIN", "LOSS", "TLDR", "CEO", "WSB", "EOD", "YTD",
@@ -130,6 +132,10 @@ def create_send_link_for_tickers(tickers: [str]) -> str:
     return f'https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message={url_encoded_tickers}'
 
 
+def create_user_not_old_enough() -> str:
+    return f'Your account must be older than {DEFAULT_ACCOUNT_AGE} days to use the bot'
+
+
 def make_pretty_message(ticker_notifications: [{}]) -> str:
     def make_title_links(submissions: [Submission]):
         title_links = ""
@@ -141,6 +147,12 @@ def make_pretty_message(ticker_notifications: [{}]) -> str:
     for n in ticker_notifications:
         pretty_message += f'## {n["ticker"]}:\n{make_title_links(n["subs"])}\n\n'
     return pretty_message
+
+
+def is_account_old_enough(account: Redditor, days: int = DEFAULT_ACCOUNT_AGE) -> bool:
+    created_at = datetime.utcfromtimestamp(account.created_utc)
+    now = datetime.utcnow()
+    return now - created_at > timedelta(days=days)
 
 
 def chunks(data, size):
