@@ -6,3 +6,6 @@ aws s3 mb s3://$BUCKET_NAME
 aws s3api put-public-access-block \
     --bucket "$BUCKET_NAME" \
     --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+aws s3api put-bucket-lifecycle-configuration \
+    --bucket "$BUCKET_NAME" \
+    --lifecycle-configuration file://deployment/bucket-lifecycle-configuration.json
