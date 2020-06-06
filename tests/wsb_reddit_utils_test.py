@@ -27,6 +27,8 @@ text = f'''
         $Z sucks, more like $ZZ
         Papa Buffet $ASMR
         SPX
+        AAAU: this should be here
+        AADR; this should also
         "$SPXL" with quotes should be detected
         South Park has known how the fed operates since 2009
         SPY Perhaps my friend isn’t ready for trading after all...
@@ -36,6 +38,7 @@ text = f'''
 
 def test_parse_tickers_from_text():
     expected_out = [
+        '$AAAU', '$AADR',
         '$ASMR', '$ATH', '$BBWT', '$BF.A', '$BIOX.W', '$BRK.A', '$BRK.B', '$BRMK.W', '$DIS', '$FBI', '$FIVES', '$GAIN',
         '$LULU', '$R', '$RIP', '$SPX', '$SPXL', '$SPY', '$VEM', '$VTIQ', '$Z', '$ZZ'
     ]

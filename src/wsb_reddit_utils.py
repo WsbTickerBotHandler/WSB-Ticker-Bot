@@ -24,9 +24,9 @@ TICKER_EXCLUSIONS = ["OTM", "ITM", "ATM", "ATH", "MACD", "ROI", "GAIN", "LOSS", 
 
 
 def parse_tickers_from_text(text) -> [str]:
-    punct_chars = """-.%#,'"&/![]()?"""
+    punct_chars = """-.%#,:;'"&/![]()?"""
     # Won't match LULU\ yet
-    punct_regex = r"(?:[-.%#,'\"&/!\[\]\(\)\?]*)"
+    punct_regex = r"(?:[-.%#,:;'\"&/!\[\]\(\)\?]*)"
     three_5 = r'{3,5}'
     one_2 = r'{1,2}'
     one_5 = r'{1,5}'
