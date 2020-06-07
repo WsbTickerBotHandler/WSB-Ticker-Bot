@@ -96,10 +96,9 @@ def create_all_subscription_notification():
     #     "You'll be notified when any new DD is posted\n\n\n\n" +
     #     'To stop your subscription to all DD, reply `stop all`'
     # )
-    ticker = random.choice(tuple(tickers_set))
     return "The ALL DD feed is temporarily disabled\n\n" +\
         "You'll still be subscribed, but you won't receive notifications until it's re-enabled\n\n\n\n" +\
-        f'In the meantime, you can subscribe to DD for specific tickers [here](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=%20%24{ticker})'
+        f'In the meantime, you can subscribe to DD for specific tickers [here](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=Type%20tickers%20%24LIKE%20%24THIS%20anywhere%20in%20this%20message%20to%20subscribe%20to%20them)'
 
 
 def create_all_unsubscription_notification():
