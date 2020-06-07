@@ -27,6 +27,7 @@ text = f'''
         $Z sucks, more like $ZZ
         Papa Buffet $ASMR
         SPX
+        $MGM/$CZR/etc is ok
         AAAU: this should be here
         AADR; this should also
         "$SPXL" with quotes should be detected
@@ -38,11 +39,11 @@ text = f'''
 
 def test_parse_tickers_from_text():
     expected_out = [
-        '$AAAU', '$AADR',
+        '$AAAU', '$AADR', '$MGM', '$CZR',
         '$ASMR', '$ATH', '$BBWT', '$BF.A', '$BIOX.W', '$BRK.A', '$BRK.B', '$BRMK.W', '$DIS', '$FBI', '$FIVES', '$GAIN',
         '$LULU', '$R', '$RIP', '$SPX', '$SPXL', '$SPY', '$VEM', '$VTIQ', '$Z', '$ZZ'
     ]
-    assert parse_tickers_from_text(text) == expected_out
+    assert parse_tickers_from_text(text) == sorted(expected_out)
 
 
 def test_make_comment_from_tickers(a_user: Redditor):
