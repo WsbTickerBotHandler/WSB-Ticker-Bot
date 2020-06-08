@@ -15,6 +15,7 @@ Resources:
       CodeUri: ../src/.
       Description: Run the WSB Ticker Bot
       Timeout: 899
+      MemorySize: 256
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole

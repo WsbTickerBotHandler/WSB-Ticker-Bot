@@ -10,6 +10,7 @@ from wsb_reddit_utils import (make_pretty_message, chunks, get_tickers_for_submi
                               create_subscription_notification, create_unsubscription_notification,
                               create_all_subscription_notification, create_all_unsubscription_notification,
                               is_account_old_enough, create_user_not_old_enough)
+from submission_utils import SubmissionNotification
 from praw.reddit import Reddit
 from praw.models import Message, Comment, Submission, Redditor
 from stock_data.tickers import tickers as tickers_set
@@ -40,7 +41,7 @@ class WSBReddit:
     def process_submissions(self, submissions: [Submission], reprocess=False):
         # self.comment_on_submissions(submissions)
         logger.info(f'Retrieved {len(submissions)} submissions')
-        tickers_with_submissions: {str: [Submission]} = self.group_submissions_for_tickers(
+        tickers_with_submissions: {str: [SubmissionNotification]} = self.group_submissions_for_tickers(
             submissions, reprocess=reprocess
         )
         self.notify_users(tickers_with_submissions)
@@ -69,7 +70,7 @@ class WSBReddit:
                     submission.reply(make_comment_from_tickers(filtered_tickers))
                 self.database.add_submission_marker(COMMENTED_SUBMISSIONS_TABLE_NAME, submission.id)
 
-    def notify_users(self, tickers_with_submissions: {str: [Submission]}):
+    def notify_users(self, tickers_with_submissions: {str: [SubmissionNotification]}):
         MAX_USERS_TO_NOTIFY_PER_CHUNK = 60
         notifications = dict()
         notified_tickers = set()
@@ -181,21 +182,21 @@ class WSBReddit:
 
         item.mark_read()
 
-    def group_submissions_for_tickers(self, submissions: [Submission], reprocess=False) -> {str: [Submission]}:
+    def group_submissions_for_tickers(self, submissions: [Submission], reprocess=False) -> {str: [SubmissionNotification]}:
         tickers_submissions = dict()
         num_processed = 0
-        for submission in submissions:
+        for s in submissions:
             # todo: move submission processing flagging to outer scope
-            if self.database.has_already_processed(NOTIFIED_SUBMISSIONS_TABLE_NAME, submission.id) and not reprocess:
+            if self.database.has_already_processed(NOTIFIED_SUBMISSIONS_TABLE_NAME, s.id) and not reprocess:
                 continue
             else:
-                tickers = get_tickers_for_submission(submission)
+                tickers = get_tickers_for_submission(s)
                 filtered_tickers = [ticker for ticker in tickers if ticker.strip('$') in tickers_set]
                 for ticker in filtered_tickers:
                     if ticker in tickers_submissions:
-                        tickers_submissions[ticker].append((submission.title, submission.permalink))
+                        tickers_submissions[ticker].append(SubmissionNotification(s.id, s.link_flair_text, s.permalink, s.title))
                     else:
-                        tickers_submissions[ticker] = [submission]
+                        tickers_submissions[ticker] = [SubmissionNotification(s.id, s.link_flair_text, s.permalink, s.title)]
                 num_processed += 1
         logger.info(f'Grabbed {num_processed} new submissions')
 
