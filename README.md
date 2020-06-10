@@ -34,3 +34,32 @@ If this bot helped your tendies print consider leaving a tip and I swear to piss
 `BCH: qzazpxhgyx8xperazwnt8js2pufckyrv2ya49s9vmf`
 
 If you lost money because you read some shit DD then open up the door to the back porch, head outside, smoke some weed and chill the fuck out. Money isn't everything. Except when you yolo your parent's 100k retirement fund. But hey, maybe if you'd seen the right DD that wouldn't have happened
+
+## Development
+Setting up the environment
+* Create a `praw.ini` file in the root directory of this project with the Reddit bot's account information
+```
+[WSBStockTickerBot]
+client_id=<client-id>
+client_secret=<client-secret>
+user_agent="lambda:WSBStockTickerBot:v1.0 (by /u/wsbtickerbothandler@gmail.com)"
+username=WSBStockTickerBot
+password=<password>
+```
+* Create an `aws-credentials.ini` file in the root directory with your AWS account's information in a profile called `wsb-ticker-bot`
+* There's probably a combination of AWS access policies you can use to ensure the bot can only do what it is intended to do but I gave it admin access for now
+```
+[wsb-ticker-bot]
+region = us-west-1
+aws_access_key_id=<access-key-id>
+aws_secret_access_key=<secret-acccess-key>
+```
+* Run the credentials configuration script `make configure_credentials`
+* General information
+    * All commands should be run through the `makefile` and executed at the top-level directory
+    * The bot is deployed on lambda and runs every 5 minutes. To deploy, you first have to have an S3 bucket to store the bot's libs. Run `make create_bucket` followed by `make deploy` to do it all
+    * A DynamoDB is configured (not set up automatically here) with some tables to track things like whether a particular submission has already been processed by the bot and which users are subscribed to which tickers. You'll fine function in `database.py` accessed throughout the app for these purposes
+    * The `utils` folder contains tools for updating the `stock_data` package with an updated list of all valid tickers
+    * The top-level function is located in `lambda.py`
+    * Top-level operational functions such as `process_inbox` are not tested. All non-externally dependent functions should be unit tested. Most externally dependent functions should be integration tested (tagged with `@pytest.mark.integration` and use a fixture to perform a test with real data)
+    
