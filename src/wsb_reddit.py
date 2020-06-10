@@ -1,19 +1,21 @@
-from typing import Union
-import time
 import logging
-
+import time
 from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from typing import Union
+
+from praw.models import Message, Comment, Submission, Redditor
+from praw.reddit import Reddit
 
 from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
-from wsb_reddit_utils import (make_pretty_message, chunks, get_tickers_for_submission, make_comment_from_tickers,
-                              reply_to, parse_tickers_from_text, create_error_notification,
-                              create_subscription_notification, create_unsubscription_notification,
-                              create_all_subscription_notification, create_all_unsubscription_notification,
-                              is_account_old_enough, create_user_not_old_enough)
+from defaults import *
+from messages import (make_comment_from_tickers,
+                      reply_to, create_error_notification, create_subscription_notification,
+                      create_unsubscription_notification, create_all_subscription_notification,
+                      create_all_unsubscription_notification, create_user_not_old_enough)
 from submission_utils import SubmissionNotification
-from praw.reddit import Reddit
-from praw.models import Message, Comment, Submission, Redditor
-from stock_data.tickers import tickers as tickers_set
+from utils import (chunks, get_tickers_for_submission,
+                   group_submissions_for_tickers, is_account_old_enough, notify, parse_tickers_from_text, create_notifications)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -21,17 +23,16 @@ logger.setLevel(logging.INFO)
 
 class WSBReddit:
     def __init__(self):
-        self.reddit = Reddit("WSBStockTickerBot")
-        self.wsb = self.reddit.subreddit("wallstreetbets")
+        self.reddit = Reddit(BOT_USERNAME)
+        self.wsb = self.reddit.subreddit(SUBREDDIT)
         self.database = Database()
 
-    @staticmethod
-    def get_another_reddit_instance():
-        return Reddit("WSBStockTickerBot")
-
     def process_inbox(self):
+        """
+        Respond to user instructions to the bot
+        """
         num_processed = 0
-        messages = list(self.reddit.inbox.unread(limit=50))
+        messages = list(self.reddit.inbox.unread(limit=UNREAD_MESSAGES_TO_PROCESS))
         messages.reverse()
         for message in messages:
             self.handle_message(message)
@@ -39,115 +40,91 @@ class WSBReddit:
         num_processed > 0 and logger.info(f'Processed {num_processed} user messages')
 
     def process_submissions(self, submissions: [Submission], reprocess=False):
+        """
+        Process submissions by first commenting on them (temp disabled) and then notifying users of them
+        :param submissions: to process
+        :param reprocess: whether to reprocess all submissions regardless of whether they have already been marked as processed
+        :return:
+        """
         # self.comment_on_submissions(submissions)
         logger.info(f'Retrieved {len(submissions)} submissions')
-        tickers_with_submissions: {str: [SubmissionNotification]} = self.group_submissions_for_tickers(
-            submissions, reprocess=reprocess
+        has_already_processed_id = partial(self.database.has_already_processed, table_name=NOTIFIED_SUBMISSIONS_TABLE_NAME)
+        tickers_with_submissions: {str: [SubmissionNotification]} = group_submissions_for_tickers(
+            submissions, has_already_processed_id, reprocess=reprocess
         )
         self.notify_users(tickers_with_submissions)
         [self.database.add_submission_marker(NOTIFIED_SUBMISSIONS_TABLE_NAME, submission.id) for submission in submissions]
         logger.info(f'Processed {len(submissions)} submissions')
 
     def get_submissions(self, limit, flair_filter=False) -> [Submission]:
-        # valid_flairs = {'DD', 'Discussion', 'Fundamentals'}
-        valid_flairs = {'DD'}
+        """
+        Retrieve submissions for the bot to work with
+        :param limit: retrieve this many submissions
+        :param flair_filter: for these flairs
+        """
         subs = self.wsb.new(limit=limit)
         if flair_filter:
-            # return [s for s in subs if s.link_flair_text in valid_flairs and len(s.selftext) > 100]
-            return [s for s in subs if s.link_flair_text in valid_flairs]
+            return [s for s in subs if s.link_flair_text in VALID_FLAIRS]
         else:
             return [s for s in subs]
 
     def comment_on_submissions(self, submissions: [Submission], reprocess=False):
+        """
+        Have the bot comment on new DD submissions with links to subscribe to tickers found in the submission
+        :param submissions: to comment on
+        :param reprocess: whether to recomment on all submissions regardless of whether they have already been marked as commented
+        """
         for submission in submissions:
-            if self.database.has_already_processed(COMMENTED_SUBMISSIONS_TABLE_NAME, submission.id) and not reprocess:
+            if self.database.has_already_processed(submission.id, table_name=COMMENTED_SUBMISSIONS_TABLE_NAME) and not reprocess:
                 continue
             else:
                 tickers = get_tickers_for_submission(submission)
-                filtered_tickers = [ticker for ticker in tickers if ticker.strip('$') in tickers_set]
-                if len(filtered_tickers) != 0:
+                if len(tickers) != 0:
                     logger.info(f'Commenting on submission {submission.id}')
-                    submission.reply(make_comment_from_tickers(filtered_tickers))
+                    submission.reply(make_comment_from_tickers(tickers))
                 self.database.add_submission_marker(COMMENTED_SUBMISSIONS_TABLE_NAME, submission.id)
 
     def notify_users(self, tickers_with_submissions: {str: [SubmissionNotification]}):
-        MAX_USERS_TO_NOTIFY_PER_CHUNK = 60
-        notifications = dict()
-        notified_tickers = set()
-        users_subscribed_to_all: [str] = []
-        # users_subscribed_to_all: [str] = self.database.get_users_subscribed_to_all_dd_feed()
+        """
+        Notify users for a number of tickers which have been found and which submissions they were found within
+        :param tickers_with_submissions: map of ticker -> submissions found in
+        """
+        get_users_subscribed_to_ticker = partial(self.database.get_users_subscribed_to_ticker)
+        notifications = create_notifications(tickers_with_submissions, get_users_subscribed_to_ticker)
 
-        len(tickers_with_submissions) > 0 and logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)})')
-        for ticker, subs in tickers_with_submissions.items():
-            logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs ])}]")
-            users_to_notify = self.database.get_users_subscribed_to_ticker(ticker)
-            unique_users_to_notify = set(users_subscribed_to_all + users_to_notify)
-            if len(unique_users_to_notify) > 0:
-                logger.info(f'Will notify {len(unique_users_to_notify)} users about ticker {ticker}')
-                notified_tickers.add(ticker)
-            for u in users_subscribed_to_all:
-                if u in notifications:
-                    for s in subs:
-                        if s.link_flair_text == 'DD':
-                            notifications[u].append({'ticker': ticker, 'subs': subs})
-                else:
-                    for s in subs:
-                        if s.link_flair_text == 'DD':
-                            notifications[u] = [{'ticker': ticker, 'subs': subs}]
-
-            for u in users_to_notify:
-                if u in notifications:
-                    notifications[u].append({'ticker': ticker, 'subs': subs})
-                else:
-                    notifications[u] = [{'ticker': ticker, 'subs': subs}]
-
-        # Ensure there are no duplicates in a user's notifications from the all DD subscription +
-        # an individual subscription
-        for u, notify_about_these in notifications.items():
-            notifications[u] = list({v['ticker']: v for v in notify_about_these}.values())
-        # Process largest notifications first so it fails if it can't be done
-        sorted_notification = {k: v for k, v in sorted(notifications.items(), key=lambda x: len(x), reverse=True)}
-        logger.debug(f'Notifications object: {sorted_notification}')
-
-        def notify(notification):
-            user_to_notify, notify_about_these_subs = notification
-            try:
-                self.get_another_reddit_instance().redditor(user_to_notify).message(
-                    'New DD posted!',
-                    make_pretty_message(notify_about_these_subs)
-                )
-            except Exception as e:
-                logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
-
-        chunked_notifications = list(chunks(sorted_notification, size=MAX_USERS_TO_NOTIFY_PER_CHUNK))
+        chunked_notifications = list(chunks(notifications, size=MAX_USERS_TO_NOTIFY_PER_CHUNK))
         remaining_chunks_to_process = len(chunked_notifications)
+
         for chunk in chunked_notifications:
             start_time = time.time()
-            with ThreadPoolExecutor(max_workers=6) as executor:
+            with ThreadPoolExecutor(max_workers=MAX_NOTIFICATION_THREADPOOL_WORKERS) as executor:
                 executor.map(notify, chunk.items())
             time_taken = (time.time() - start_time)
             sleep_for = 61 - time_taken
 
             remaining_chunks_to_process -= 1
-            # logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users, {remaining_chunks_to_process} chunks of users left to process')
             # Reddit limits us to 60 requests/min so wait 1 min before making 60 more requests
             if remaining_chunks_to_process > 0:
-                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users. Sleeping for {int(sleep_for)} seconds...')
+                logger.info(
+                    f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users, {remaining_chunks_to_process} chunks of users left to process. Sleeping for {int(sleep_for)} seconds...')
                 time.sleep(sleep_for)
             else:
                 logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users')
 
-        len(sorted_notification) > 0 and logger.info(f'Notified {len(sorted_notification)} users about {len(notified_tickers)} tickers')
+        len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users')
 
     def handle_message(self, item: Union[Message, Comment]):
-        MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE = 10
+        """
+        Respond to a particular user message or comment
+        :param item: the message or comment to respond to
+        """
         body: str = item.body
         author: Redditor = item.author
 
         if author.name == "reddit":
             item.mark_read()
             return
-        tickers = [ticker for ticker in parse_tickers_from_text(body) if ticker.strip('$') in tickers_set]
+        tickers = [ticker for ticker in parse_tickers_from_text(body)]
 
         is_old_enough = is_account_old_enough(author)
 
@@ -181,23 +158,3 @@ class WSBReddit:
             reply_to(item, create_user_not_old_enough())
 
         item.mark_read()
-
-    def group_submissions_for_tickers(self, submissions: [Submission], reprocess=False) -> {str: [SubmissionNotification]}:
-        tickers_submissions = dict()
-        num_processed = 0
-        for s in submissions:
-            # todo: move submission processing flagging to outer scope
-            if self.database.has_already_processed(NOTIFIED_SUBMISSIONS_TABLE_NAME, s.id) and not reprocess:
-                continue
-            else:
-                tickers = get_tickers_for_submission(s)
-                filtered_tickers = [ticker for ticker in tickers if ticker.strip('$') in tickers_set]
-                for ticker in filtered_tickers:
-                    if ticker in tickers_submissions:
-                        tickers_submissions[ticker].append(SubmissionNotification(s.id, s.link_flair_text, s.permalink, s.title))
-                    else:
-                        tickers_submissions[ticker] = [SubmissionNotification(s.id, s.link_flair_text, s.permalink, s.title)]
-                num_processed += 1
-        logger.info(f'Grabbed {num_processed} new submissions')
-
-        return tickers_submissions

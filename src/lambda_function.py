@@ -1,18 +1,18 @@
 import logging
-from wsb_reddit import *
+
+from defaults import *
+from wsb_reddit import WSBReddit
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-DEFAULT_SUBMISSION_LIMIT = 30
-DEFAULT_REPROCESS = False
-
 
 def lambda_handler(event, context):
+    # Use these keys for configuring the bot at runtime using events (can send test events in lambda)
     try:
         event['submission_limit']
     except KeyError:
-        event['submission_limit'] = DEFAULT_SUBMISSION_LIMIT
+        event['submission_limit'] = DEFAULT_SUBMISSION_RETRIEVE_LIMIT
     try:
         event['reprocess']
     except KeyError:

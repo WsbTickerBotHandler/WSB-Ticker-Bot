@@ -56,7 +56,7 @@ class Database:
         except KeyError:
             return []
 
-    def has_already_processed(self, table_name, submission_id) -> bool:
+    def has_already_processed(self, submission_id, table_name, ) -> bool:
         try:
             self.client.get_item(
                 TableName=table_name,
@@ -76,18 +76,6 @@ class Database:
             },
             ReturnValues='NONE'
         )
-
-    def ticker_exists(self, symbol: str) -> bool:
-        try:
-            self.client.get_item(
-                TableName='stock-symbols',
-                Key={
-                    'symbol': {'S': symbol.strip("$")}
-                }
-            )['Item']
-            return True
-        except KeyError:
-            return False
 
     def subscribe_user_to_all_dd_feed(self, user_name: str):
         self.client.put_item(
