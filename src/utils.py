@@ -70,7 +70,7 @@ def create_notifications(tickers_with_submissions: {str: [SubmissionNotification
     # Process largest notifications first so it fails if it can't be done
     sorted_notifications = {k: v for k, v in sorted(notifications.items(), key=lambda x: len(x), reverse=True)}
     logger.debug(f'Notifications object: {sorted_notifications}')
-    logger.info(f"Will notify users about a total of {notified_tickers} unique tickers")
+    len(notified_tickers) > 0 and logger.info(f"Will notify users about a total of {len(notified_tickers)} unique tickers")
     return sorted_notifications
 
 
