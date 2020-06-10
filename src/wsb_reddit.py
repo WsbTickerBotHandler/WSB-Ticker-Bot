@@ -121,7 +121,7 @@ class WSBReddit:
         body: str = item.body
         author: Redditor = item.author
 
-        if author.name == "reddit":
+        if author.name in {"reddit", "AutoModerator"}:
             item.mark_read()
             return
         tickers = [ticker for ticker in parse_tickers_from_text(body)]
