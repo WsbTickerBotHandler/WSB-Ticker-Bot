@@ -127,17 +127,6 @@ def is_account_old_enough(account: Redditor, days: int = DEFAULT_ACCOUNT_AGE) ->
     return now - created_at > timedelta(days=days)
 
 
-def notify(notification):
-    user_to_notify, notify_about_these_subs = notification
-    try:
-        get_another_reddit_instance().redditor(user_to_notify).message(
-            'New DD posted!',
-            make_pretty_message(notify_about_these_subs)
-        )
-    except Exception as e:
-        logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
-
-
 def parse_tickers_from_text(text) -> [str]:
     """
     :return: all tickers found in the text string

@@ -1,6 +1,4 @@
 import logging
-import time
-from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from typing import Union
 
@@ -14,8 +12,9 @@ from messages import (make_comment_from_tickers,
                       create_unsubscription_notification, create_all_subscription_notification,
                       create_all_unsubscription_notification, create_user_not_old_enough)
 from submission_utils import SubmissionNotification
-from utils import (chunks, get_tickers_for_submission,
-                   group_submissions_for_tickers, is_account_old_enough, notify, parse_tickers_from_text, create_notifications)
+from utils import (get_tickers_for_submission,
+                   group_submissions_for_tickers, is_account_old_enough, make_pretty_message,
+                   parse_tickers_from_text, create_notifications)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -47,7 +46,7 @@ class WSBReddit:
         :return:
         """
         logger.info(f'Retrieved {len(submissions)} submissions')
-        self.comment_on_submissions(submissions)
+        # self.comment_on_submissions(submissions)
         has_already_processed_id = partial(self.database.has_already_processed, table_name=NOTIFIED_SUBMISSIONS_TABLE_NAME)
         tickers_with_submissions: {str: [SubmissionNotification]} = group_submissions_for_tickers(
             submissions, has_already_processed_id, reprocess=reprocess
@@ -91,27 +90,20 @@ class WSBReddit:
         """
         get_users_subscribed_to_ticker = partial(self.database.get_users_subscribed_to_ticker)
         notifications = create_notifications(tickers_with_submissions, get_users_subscribed_to_ticker)
-
-        chunked_notifications = list(chunks(notifications, size=MAX_USERS_TO_NOTIFY_PER_CHUNK))
-        remaining_chunks_to_process = len(chunked_notifications)
-
-        for chunk in chunked_notifications:
-            start_time = time.time()
-            with ThreadPoolExecutor(max_workers=MAX_NOTIFICATION_THREADPOOL_WORKERS) as executor:
-                executor.map(notify, chunk.items())
-            time_taken = (time.time() - start_time)
-            sleep_for = 61 - time_taken
-
-            remaining_chunks_to_process -= 1
-            # Reddit limits us to 60 requests/min so wait 1 min before making 60 more requests
-            if remaining_chunks_to_process > 0:
-                logger.info(
-                    f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users, {remaining_chunks_to_process} chunks of users left to process. Sleeping for {int(sleep_for)} seconds...')
-                time.sleep(sleep_for)
-            else:
-                logger.info(f'Took {int(time_taken)} seconds to notify {len(chunk.items())} users')
+        for n in notifications:
+            self.notify(n)
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users')
+
+    def notify(self, notification):
+        user_to_notify, notify_about_these_subs = notification
+        try:
+            self.reddit.redditor(user_to_notify).message(
+                'New DD posted!',
+                make_pretty_message(notify_about_these_subs)
+            )
+        except Exception as e:
+            logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
 
     def handle_message(self, item: Union[Message, Comment]):
         """
