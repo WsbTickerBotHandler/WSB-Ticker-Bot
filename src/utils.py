@@ -7,7 +7,6 @@ from praw.models import Redditor, Submission
 from praw.reddit import Reddit
 
 from defaults import BOT_USERNAME, DEFAULT_ACCOUNT_AGE, MAX_TICKERS_ALLOWED_IN_SUBMISSION, TICKER_EXCLUSIONS
-from messages import make_pretty_message
 from stock_data.tickers import tickers as tickers_set
 from submission_utils import SubmissionNotification
 
@@ -155,3 +154,24 @@ def parse_tickers_from_text(text) -> [str]:
 
     # Add $ to front if it is not there, unique, and sort
     return list(sorted(set(['$' + ticker if ticker[0] != '$' else ticker for ticker in stripped_punct_tickers if ticker.strip('$') in tickers_set])))
+
+
+def should_sleep_for_seconds(text):
+    find_seconds = r'try again in (\d+) seconds?'
+    find_minutes = r'try again in (\d+) minutes?'
+
+    time_seconds = re.search(find_seconds, text)
+    time_minutes = re.search(find_minutes, text)
+
+    if time_seconds is not None:
+        sleep_time = time_seconds.group(1)
+        logger.info(f"Sleeping for {sleep_time} seconds")
+        return float(sleep_time)
+    elif time_minutes is not None:
+        sleep_time = time_minutes.group(1)
+        logger.info(f"Sleeping for {sleep_time} minutes")
+        return float(sleep_time) * 60
+    else:
+        return float(0)
+
+

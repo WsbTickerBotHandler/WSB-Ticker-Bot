@@ -1,4 +1,5 @@
 import logging
+import time
 from functools import partial
 from typing import Union
 
@@ -7,14 +8,14 @@ from praw.reddit import Reddit
 
 from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
 from defaults import *
-from messages import (make_comment_from_tickers,
+from messages import (make_comment_from_tickers, make_pretty_message,
                       reply_to, create_error_notification, create_subscription_notification,
                       create_unsubscription_notification, create_all_subscription_notification,
                       create_all_unsubscription_notification, create_user_not_old_enough)
 from submission_utils import SubmissionNotification
 from utils import (get_tickers_for_submission,
-                   group_submissions_for_tickers, is_account_old_enough, make_pretty_message,
-                   parse_tickers_from_text, create_notifications)
+                   group_submissions_for_tickers, is_account_old_enough,
+                   parse_tickers_from_text, create_notifications, should_sleep_for_seconds)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -95,15 +96,23 @@ class WSBReddit:
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users')
 
-    def notify(self, notification):
+    def notify(self, notification, attempts_left=2):
         user_to_notify, notify_about_these_subs = notification
-        try:
-            self.reddit.redditor(user_to_notify).message(
-                'New DD posted!',
-                make_pretty_message(notify_about_these_subs)
-            )
-        except Exception as e:
-            logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
+
+        if attempts_left == 0:
+            logger.error(f'Notification of user {user_to_notify} failed and will not retry')
+        else:
+            try:
+                self.reddit.redditor(user_to_notify).message(
+                    'New DD posted!',
+                    make_pretty_message(notify_about_these_subs)
+                )
+            except Exception as e:
+                logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
+                sleep_for = should_sleep_for_seconds(str(e))
+                if sleep_for > 0:
+                    time.sleep(sleep_for + 1)
+                    self.notify(notification, attempts_left=attempts_left - 1)
 
     def handle_message(self, item: Union[Message, Comment]):
         """

@@ -4,7 +4,7 @@ from defaults import TICKER_EXCLUSIONS
 from fixtures import *
 from submission_utils import SubmissionNotification
 from utils import chunks, create_notifications, get_tickers_for_submission, group_submissions_for_tickers, \
-    is_account_old_enough, parse_tickers_from_text
+    is_account_old_enough, parse_tickers_from_text, should_sleep_for_seconds
 
 
 def test_chunks():
@@ -132,3 +132,12 @@ def test_parse_tickers_from_text():
     expected_out = ['$AAAU', '$AADR', '$ATH', '$MGM', '$CZR', '$BF.A', '$BIOX.W', '$BRK.A', '$BRK.B', '$BRMK.W', '$DIS', '$GAIN', '$LULU', '$R', '$SPXL',
                     '$SPY', '$VTIQ', '$Z']
     assert parse_tickers_from_text(text) == sorted(expected_out)
+
+
+def test_sleep_for_time():
+    text_second = 'try again in 1 second'
+    text_seconds = 'try again in 2 seconds'
+    text_minutes = 'try again in 1 minutes'
+    should_sleep_for_seconds(text_second)
+    should_sleep_for_seconds(text_seconds)
+    # sleep_for_time(text_minutes)
