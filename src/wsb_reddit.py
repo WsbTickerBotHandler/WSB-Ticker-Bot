@@ -90,7 +90,7 @@ class WSBReddit:
         """
         get_users_subscribed_to_ticker = partial(self.database.get_users_subscribed_to_ticker)
         notifications = create_notifications(tickers_with_submissions, get_users_subscribed_to_ticker)
-        for n in notifications:
+        for n in notifications.items():
             self.notify(n)
 
         len(notifications) > 0 and logger.info(f'Notified {len(notifications)} users')
