@@ -46,8 +46,8 @@ class WSBReddit:
         :param reprocess: whether to reprocess all submissions regardless of whether they have already been marked as processed
         :return:
         """
-        # self.comment_on_submissions(submissions)
         logger.info(f'Retrieved {len(submissions)} submissions')
+        self.comment_on_submissions(submissions)
         has_already_processed_id = partial(self.database.has_already_processed, table_name=NOTIFIED_SUBMISSIONS_TABLE_NAME)
         tickers_with_submissions: {str: [SubmissionNotification]} = group_submissions_for_tickers(
             submissions, has_already_processed_id, reprocess=reprocess

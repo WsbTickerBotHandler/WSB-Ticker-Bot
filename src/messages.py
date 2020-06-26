@@ -56,10 +56,10 @@ def make_comment_from_tickers(tickers: [str]):
     ticker2 = random.choice(tuple(tickers_set))
     return (
         "I'm a bot, REEEEEEE\n\n"
-        f"I've found these tickers in this submission: {' '.join([create_send_link_for_ticker(t) for t in tickers])}\n"
-        "I can notify you when DD is posted about these tickers in the future\n"
-        f'Click on the ticker above to subscribe or click [here]({create_send_link_for_tickers(tickers)}) to be subscribed to all tickers in this post\n'
-        f"Comment below or send me a private message (not a chat!) like `${ticker} ${ticker2}` to subscribe to other tickers\n"
+        f"I've found these tickers in this submission: {' '.join([create_send_link_for_ticker(t) for t in tickers])}\n\n"
+        "I can notify you when DD is posted about these tickers in the future.\n"
+        f'Click on a ticker link above to subscribe or click [here]({create_send_link_for_tickers(tickers)}) to subscribe to all tickers in this post\n\n'
+        f"Comment below or send me a private message (not a chat!) like `${ticker} ${ticker2}` to subscribe to other tickers.\n"
         "Read how to use me [here](https://www.reddit.com/user/WSBStockTickerBot/comments/gt375p/how_to_use_me/)"
     )
 
