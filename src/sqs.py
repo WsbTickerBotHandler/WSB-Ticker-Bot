@@ -2,7 +2,7 @@ import boto3
 import os
 from boto3 import Session
 from botocore.exceptions import ProfileNotFound
-from utils import encode_notification_for_sqs
+from utils import chunk_list, encode_notification_for_sqs
 
 
 class SQS:
@@ -27,10 +27,11 @@ class SQS:
 
     def send_notification_batch(self, notifications):
         entries = [self.create_notification_message(n) for n in notifications]
-        self.client.send_message_batch(
-            QueueUrl=self.queue_url,
-            Entries=entries
-        )
+        for entries_chunk in chunk_list(entries, 10):
+            self.client.send_message_batch(
+                QueueUrl=self.queue_url,
+                Entries=entries_chunk
+            )
 
     @staticmethod
     def create_notification_message(notification):
