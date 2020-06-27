@@ -1,4 +1,5 @@
 import logging
+import os
 
 from defaults import *
 from wsb_reddit import WSBReddit
@@ -7,7 +8,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def lambda_handler(event, context):
+def run_bot(event, context):
     # Use these keys for configuring the bot at runtime using events (can send test events in lambda)
     try:
         event['submission_limit']
@@ -27,7 +28,7 @@ def lambda_handler(event, context):
 
 
 def run(submission_limit: int, reprocess: bool):
-    wsb_reddit = WSBReddit()
+    wsb_reddit = WSBReddit(os.environ['BotUserName'])
     submissions = wsb_reddit.get_submissions(limit=submission_limit, flair_filter=True)
 
     wsb_reddit.process_inbox()

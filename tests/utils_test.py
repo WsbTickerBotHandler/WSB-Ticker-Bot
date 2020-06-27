@@ -4,7 +4,7 @@ from defaults import TICKER_EXCLUSIONS
 from fixtures import *
 from submission_utils import SubmissionNotification
 from utils import chunks, create_notifications, get_tickers_for_submission, group_submissions_for_tickers, \
-    is_account_old_enough, parse_tickers_from_text, should_sleep_for_seconds
+    is_account_old_enough, parse_tickers_from_text, should_sleep_for_seconds, encode_notification_for_sqs, decode_notification_from_sqs
 
 
 def test_chunks():
@@ -141,3 +141,19 @@ def test_sleep_for_time():
     should_sleep_for_seconds(text_second)
     should_sleep_for_seconds(text_seconds)
     # sleep_for_time(text_minutes)
+
+
+def test_encode_decode():
+    notification = {'SomeUser': [{
+        'subs': [SubmissionNotification(
+            id='gn18pl',
+            link_flair_text=None,
+            permalink='/r/test/comments/gn18pl/check_it_out/',
+            title='Check it out'
+        )],
+        'ticker': '$SPY'
+    }]}
+
+    string = encode_notification_for_sqs(notification)
+    result = decode_notification_from_sqs(string)
+    assert result['SomeUser'][0]['ticker'] == "$SPY"

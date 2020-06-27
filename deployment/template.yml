@@ -6,14 +6,18 @@ Parameters:
     Type: String
     Description: The runtime version of the WSB Ticker Bot
 Resources:
-  function:
+  WsbTickerBot:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: WsbTickerBotRun
-      Handler: lambda_function.lambda_handler
+      FunctionName: WsbTickerBot
+      Handler: lambda_function_bot.run_bot
       Runtime: python3.8
       CodeUri: ../src/.
       Description: Run the WSB Ticker Bot
+      Environment:
+        Variables:
+          BotUserName: WSBStockTickerBot
+          NotificationsQueueUrl: !Ref NotificationsQueue
       Timeout: 899
       MemorySize: 256
       # Function's execution role
@@ -21,6 +25,7 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
         - AmazonDynamoDBFullAccess
+        - AmazonSQSFullAccess
       Layers:
         - !Ref libs
       Events:
@@ -33,6 +38,73 @@ Resources:
             Description: Run every 10 minutes
       Tags:
         Version: !Ref Version
+
+  WsbTickerBotNotifier0:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: WsbTickerBotNotifier0
+      Handler: lambda_function_notifier.process_notifications
+      Runtime: python3.8
+      CodeUri: ../src/.
+      Description: Run the WSB Ticker Bot
+      Environment:
+        Variables:
+          BotUserName: WSBStockTickerBot
+          NotificationsQueueUrl: !Ref NotificationsQueue
+      Timeout: 899
+      MemorySize: 256
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AmazonDynamoDBFullAccess
+        - AmazonSQSFullAccess
+      Layers:
+        - !Ref libs
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt NotificationsQueue.Arn
+            BatchSize: 10
+      Tags:
+        Version: !Ref Version
+
+  WsbTickerBotNotifier1:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: WsbTickerBotNotifier1
+      Handler: lambda_function_notifier.process_notifications
+      Runtime: python3.8
+      CodeUri: ../src/.
+      Description: Run the WSB Ticker Bot
+      Environment:
+        Variables:
+          BotUserName: WSBTickerBotHandler
+          NotificationsQueueUrl: !Ref NotificationsQueue
+      Timeout: 899
+      MemorySize: 256
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AmazonDynamoDBFullAccess
+        - AmazonSQSFullAccess
+      Layers:
+        - !Ref libs
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt NotificationsQueue.Arn
+            BatchSize: 10
+      Tags:
+        Version: !Ref Version
+
+  NotificationsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 900
 
   libs:
     Type: AWS::Serverless::LayerVersion

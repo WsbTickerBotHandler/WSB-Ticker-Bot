@@ -1,4 +1,6 @@
+import codecs
 import logging
+import pickle
 import re
 from datetime import datetime, timedelta
 from itertools import islice
@@ -175,3 +177,10 @@ def should_sleep_for_seconds(text):
         return float(0)
 
 
+# https://stackoverflow.com/questions/30469575/how-to-pickle-and-unpickle-to-portable-string-in-python-3
+def encode_notification_for_sqs(notification) -> str:
+    return codecs.encode(pickle.dumps(notification), "base64").decode()
+
+
+def decode_notification_from_sqs(notification: str):
+    return pickle.loads(codecs.decode(notification.encode(), "base64"))

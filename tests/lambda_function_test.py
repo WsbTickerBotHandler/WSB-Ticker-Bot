@@ -1,6 +1,6 @@
 import pytest
 
-from lambda_function import *
+from lambda_function_bot import *
 
 
 @pytest.mark.integration
