@@ -40,6 +40,37 @@ Resources:
       Tags:
         Version: !Ref Version
 
+  WsbTickerBotHandlerProcessInbox:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: WsbTickerBotHandlerProcessInbox
+      Handler: lambda_function_process_inbox.process_inbox
+      Runtime: python3.8
+      CodeUri: ../src/.
+      Description: Process the handler's inbox
+      Environment:
+        Variables:
+          BotUserName: WSBTickerBotHandler
+      Timeout: 899
+      MemorySize: 128
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        - AmazonDynamoDBFullAccess
+      Layers:
+        - !Ref libs
+      Events:
+        ScheduledRun:
+          Type: Schedule
+          Properties:
+            Schedule: 'cron(0/10 * * * ? *)'
+            Name: ProcessHandlerInboxEveryTenMinutes
+            Input: !Sub "{\"version\": \"${Version}\"}"
+            Description: Process handler inbox every 10 minutes
+      Tags:
+        Version: !Ref Version
+
   WsbTickerBotNotifier0:
     Type: AWS::Serverless::Function
     Properties:

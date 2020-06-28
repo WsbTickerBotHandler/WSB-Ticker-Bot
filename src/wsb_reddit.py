@@ -14,8 +14,7 @@ from messages import (make_comment_from_tickers, make_pretty_message,
                       create_all_unsubscription_notification, create_user_not_old_enough)
 from sqs import SQS
 from submission_utils import SubmissionNotification
-from utils import (get_tickers_for_submission,
-                   group_submissions_for_tickers, is_account_old_enough,
+from utils import (get_tickers_for_submission, decode_notification_from_sqs, group_submissions_for_tickers, is_account_old_enough,
                    parse_tickers_from_text, create_notifications, should_sleep_for_seconds)
 
 logger = logging.getLogger()
@@ -96,7 +95,10 @@ class WSBReddit:
         self.sqs.send_notification_batch(notifications.items())
         len(notifications) > 0 and logger.info(f'Queued {len(notifications)} notifications')
 
-    def notify(self, notification, attempts_left=2):
+    def notify(self, notification_event, attempts_left=2):
+        notification = decode_notification_from_sqs(notification_event['body'])
+        receipt_handle = notification_event['receiptHandle']
+
         user_to_notify, notify_about_these_subs = notification
 
         if attempts_left == 0:
@@ -108,12 +110,13 @@ class WSBReddit:
                     'New DD posted!',
                     make_pretty_message(notify_about_these_subs)
                 )
+                self.sqs.delete_notification(receipt_handle)
             except Exception as e:
                 logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
                 sleep_for = should_sleep_for_seconds(str(e))
                 if sleep_for > 0:
                     time.sleep(sleep_for + 1)
-                    self.notify(notification, attempts_left=attempts_left - 1)
+                    self.notify(notification_event, attempts_left=attempts_left - 1)
 
     def handle_message(self, item: Union[Message, Comment]):
         """

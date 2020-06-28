@@ -1,7 +1,9 @@
-import boto3
 import os
+
+import boto3
 from boto3 import Session
 from botocore.exceptions import ProfileNotFound
+
 from utils import chunk_list, encode_notification_for_sqs
 
 
@@ -33,10 +35,15 @@ class SQS:
                 Entries=entries_chunk
             )
 
+    def delete_notification(self, notification_receipt_handle):
+        self.client.delete_message(
+            QueueUrl=self.queue_url,
+            ReceiptHandle=notification_receipt_handle
+        )
+
     @staticmethod
     def create_notification_message(notification):
         return {
             'Id': str(hash(str(notification))),
             'MessageBody': encode_notification_for_sqs(notification)
         }
-
