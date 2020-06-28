@@ -190,3 +190,4 @@ def encode_notification_for_sqs(notification) -> str:
 
 def decode_notification_from_sqs(notification: str):
     return pickle.loads(codecs.decode(notification.encode(), "base64"))
+

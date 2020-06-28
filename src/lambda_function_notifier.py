@@ -8,10 +8,11 @@ logger.setLevel(logging.INFO)
 
 
 def process_notifications(event, context):
-    wsb_reddit = WSBReddit(os.environ['BotUserName'])
+    bot_user = os.environ['BotUserName']
+    wsb_reddit = WSBReddit(bot_user)
 
     notifications = event['Records']
-    logger.info(f"Processing {len(notifications)} notifications")
+    logger.info(f"{bot_user} processing {len(notifications)} notifications")
     for notification in notifications:
         wsb_reddit.notify(notification)
-    logger.info("Finished processing")
+    logger.info(f"{bot_user} finished processing")
