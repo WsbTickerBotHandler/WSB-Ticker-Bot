@@ -11,7 +11,7 @@ def process_notifications(event, context):
     wsb_reddit = WSBReddit(os.environ['BotUserName'])
 
     notifications = event['Records']
-    logger.info(f"Processing {len(notifications)} notification")
+    logger.info(f"Processing {len(notifications)} notifications")
     for notification in notifications:
         wsb_reddit.notify(notification)
     logger.info("Finished processing")

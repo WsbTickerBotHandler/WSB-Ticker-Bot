@@ -141,7 +141,6 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       VisibilityTimeout: 900
-      ReceiveMessageWaitTimeSeconds: 10
 
   libs:
     Type: AWS::Serverless::LayerVersion
