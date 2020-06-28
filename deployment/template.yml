@@ -44,15 +44,17 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: WsbTickerBotHandlerProcessInbox
-      Handler: lambda_function_process_inbox.process_inbox
+      Handler: lambda_function_process_helper_inbox.process_inbox
       Runtime: python3.8
       CodeUri: ../src/.
       Description: Process the handler's inbox
       Environment:
         Variables:
           BotUserName: WSBTickerBotHandler
+          NotificationsQueueUrl: !Ref NotificationsQueue
       Timeout: 899
       MemorySize: 128
+      ReservedConcurrentExecutions: 1
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -95,7 +97,7 @@ Resources:
       Layers:
         - !Ref libs
       Events:
-        MySQSEvent:
+        UserNotification:
           Type: SQS
           Properties:
             Queue: !GetAtt NotificationsQueue.Arn
@@ -127,7 +129,7 @@ Resources:
       Layers:
         - !Ref libs
       Events:
-        MySQSEvent:
+        UserNotification:
           Type: SQS
           Properties:
             Queue: !GetAtt NotificationsQueue.Arn
@@ -139,6 +141,7 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       VisibilityTimeout: 900
+      ReceiveMessageWaitTimeSeconds: 10
 
   libs:
     Type: AWS::Serverless::LayerVersion
