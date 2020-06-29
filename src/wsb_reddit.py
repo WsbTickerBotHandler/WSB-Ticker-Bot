@@ -5,6 +5,7 @@ from typing import Union
 
 from praw.models import Message, Comment, Submission, Redditor
 from praw.reddit import Reddit
+from prawcore.exceptions import ServerError
 
 from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
 from defaults import *
@@ -33,11 +34,15 @@ class WSBReddit:
         Respond to user instructions to the bot
         """
         num_processed = 0
-        messages = list(self.reddit.inbox.unread(limit=UNREAD_MESSAGES_TO_PROCESS))
-        messages.reverse()
-        for message in messages:
-            self.handle_message(message)
-            num_processed += 1
+        try:
+            messages = list(self.reddit.inbox.unread(limit=UNREAD_MESSAGES_TO_PROCESS))
+            messages.reverse()
+            for message in messages:
+                self.handle_message(message)
+                num_processed += 1
+        except ServerError as e:
+            logger.error(f"Reddit API servers returned an error: {e}")
+
         num_processed > 0 and logger.info(f'Processed {num_processed} user messages')
 
     def process_submissions(self, submissions: [Submission], reprocess=False):
