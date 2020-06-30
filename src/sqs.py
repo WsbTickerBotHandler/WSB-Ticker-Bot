@@ -4,7 +4,7 @@ import boto3
 from boto3 import Session
 from botocore.exceptions import ProfileNotFound
 
-from utils import chunk_list, encode_notification
+from utils import chunk_list, encode_notification_for_sqs
 
 
 class SQS:
@@ -24,16 +24,18 @@ class SQS:
     def send_notification(self, notification):
         self.client.send_message(
             QueueUrl=self.queue_url,
-            MessageBody=encode_notification(notification)
+            MessageBody=encode_notification_for_sqs(notification)
         )
 
     def send_notification_batch(self, notifications):
-        entries = [self.create_notification_message(n) for n in notifications]
-        for entries_chunk in chunk_list(entries, 10):
-            self.client.send_message_batch(
-                QueueUrl=self.queue_url,
-                Entries=entries_chunk
-            )
+        total = []
+        for entries_chunk in chunk_list(notifications, 10):
+            total.append(encode_notification_for_sqs(entries_chunk))
+
+        self.client.send_message_batch(
+            QueueUrl=self.queue_url,
+            Entries=[self.create_notification_message(e) for e in total]
+        )
 
     def delete_notification(self, notification_receipt_handle):
         self.client.delete_message(
@@ -45,5 +47,5 @@ class SQS:
     def create_notification_message(notification):
         return {
             'Id': str(hash(str(notification))),
-            'MessageBody': encode_notification(notification)
+            'MessageBody': notification
         }

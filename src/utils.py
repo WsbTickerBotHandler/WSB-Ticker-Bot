@@ -1,4 +1,5 @@
 import base64
+import codecs
 import logging
 import pickle
 import re
@@ -46,7 +47,6 @@ def create_notifications(tickers_with_submissions: {str: [SubmissionNotification
     users_subscribed_to_all: [str] = []
     # users_subscribed_to_all: [str] = self.database.get_users_subscribed_to_all_dd_feed()
 
-    len(tickers_with_submissions) > 0 and logger.info(f'Found tickers {tickers_with_submissions.keys()} ({len(tickers_with_submissions)})')
     for ticker, subs in tickers_with_submissions.items():
         logger.info(f"Found ticker {ticker} mentioned in posts [{', '.join([s.id for s in subs])}]")
         users_to_notify = get_users_subscribed_to_ticker(ticker)
@@ -191,6 +191,15 @@ def should_sleep_for_seconds(text):
         return float(sleep_time) * 60
     else:
         return float(0)
+
+
+# https://stackoverflow.com/questions/30469575/how-to-pickle-and-unpickle-to-portable-string-in-python-3
+def encode_notification_for_sqs(notification) -> str:
+    return codecs.encode(pickle.dumps(notification), "base64").decode()
+
+
+def decode_notification_from_sqs(notification: str):
+    return pickle.loads(codecs.decode(notification.encode(), "base64"))
 
 
 def decode_notification_kinesis(notification: str) -> tuple:

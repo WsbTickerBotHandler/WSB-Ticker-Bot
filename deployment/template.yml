@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: A stack that manages running the WSB Ticker Bot
+Description: A stack that manages running the WSB Stock Ticker Bot
 Parameters:
   Version:
     Type: String
@@ -17,7 +17,7 @@ Resources:
       Environment:
         Variables:
           BotUserName: WSBStockTickerBot
-          NotificationsStreamName: !Ref NotificationsStream
+          NotificationsQueueUrl: !Ref NotificationsQueue
       Timeout: 60
       MemorySize: 256
       ReservedConcurrentExecutions: 1
@@ -26,7 +26,7 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
         - AmazonDynamoDBFullAccess
-        - AmazonKinesisFullAccess
+        - AmazonSQSFullAccess
       Layers:
         - !Ref libs
       Events:
@@ -51,8 +51,8 @@ Resources:
       Environment:
         Variables:
           BotUserName: WSBStockTickerBot
-          NotificationsStreamName: !Ref NotificationsStream
-      Timeout: 60
+          NotificationsQueueUrl: !Ref NotificationsQueue
+      Timeout: 20
       MemorySize: 128
       ReservedConcurrentExecutions: 1
       # Function's execution role
@@ -84,8 +84,8 @@ Resources:
       Environment:
         Variables:
           BotUserName: WSBTickerBotHandler
-          NotificationsStreamName: !Ref NotificationsStream
-      Timeout: 60
+          NotificationsQueueUrl: !Ref NotificationsQueue
+      Timeout: 20
       MemorySize: 128
       ReservedConcurrentExecutions: 1
       # Function's execution role
@@ -117,8 +117,8 @@ Resources:
       Environment:
         Variables:
           BotUserName: WSBStockTickerBot
-          NotificationsStreamName: !Ref NotificationsStream
-      Timeout: 120
+          NotificationsQueueUrl: !Ref NotificationsQueue
+      Timeout: 60
       MemorySize: 256
       ReservedConcurrentExecutions: 1
       # Function's execution role
@@ -126,17 +126,15 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
         - AmazonDynamoDBFullAccess
-        - AmazonKinesisFullAccess
+        - AmazonSQSFullAccess
       Layers:
         - !Ref libs
       Events:
         UserNotification:
-          Type: Kinesis
+          Type: SQS
           Properties:
-            Stream: !GetAtt NotificationsConsumer.ConsumerARN
-            BatchSize: 10
-            MaximumBatchingWindowInSeconds: 5
-            StartingPosition: LATEST
+            Queue: !GetAtt NotificationsQueue.Arn
+            BatchSize: 1
       Tags:
         Version: !Ref Version
 
@@ -151,8 +149,8 @@ Resources:
       Environment:
         Variables:
           BotUserName: WSBTickerBotHandler
-          NotificationsStreamName: !Ref NotificationsStream
-      Timeout: 120
+          NotificationsQueueUrl: !Ref NotificationsQueue
+      Timeout: 60
       MemorySize: 256
       ReservedConcurrentExecutions: 1
       # Function's execution role
@@ -160,31 +158,22 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
         - AmazonDynamoDBFullAccess
-        - AmazonKinesisFullAccess
+        - AmazonSQSFullAccess
       Layers:
         - !Ref libs
       Events:
         UserNotification:
-          Type: Kinesis
+          Type: SQS
           Properties:
-            Stream: !GetAtt NotificationsConsumer.ConsumerARN
-            BatchSize: 10
-            MaximumBatchingWindowInSeconds: 5
-            StartingPosition: LATEST
+            Queue: !GetAtt NotificationsQueue.Arn
+            BatchSize: 1
       Tags:
         Version: !Ref Version
 
-  NotificationsConsumer:
-    Type: AWS::Kinesis::StreamConsumer
-      Properties:
-        ConsumerName: NotificationsConsumer
-        StreamARN: !GetAtt NotificationsStream.Arn
-
-  NotificationsStream:
-    Type: AWS::Kinesis::Stream
+  NotificationsQueue:
+    Type: AWS::SQS::Queue
     Properties:
-      Name: wsb-ticker-bot-notifications
-      ShardCount: 1
+      VisibilityTimeout: 61
 
   libs:
     Type: AWS::Serverless::LayerVersion

@@ -9,7 +9,7 @@ from prawcore.exceptions import ServerError
 
 from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
 from defaults import *
-from kinesis import Kinesis
+from sqs import SQS
 from messages import (make_comment_from_tickers, make_pretty_message,
                       reply_to, create_error_notification, create_subscription_notification,
                       create_unsubscription_notification, create_all_subscription_notification,
@@ -23,11 +23,11 @@ logger.setLevel(logging.INFO)
 
 
 class WSBReddit:
-    def __init__(self, username, stream_name=None):
+    def __init__(self, username, queue_url=None):
         self.reddit = Reddit(username)
         self.wsb = self.reddit.subreddit(SUBREDDIT)
         self.database = Database()
-        self.kinesis = Kinesis(stream_name)
+        self.sqs = SQS(queue_url)
 
     def process_inbox(self):
         """
@@ -98,7 +98,7 @@ class WSBReddit:
         get_users_subscribed_to_ticker = partial(self.database.get_users_subscribed_to_ticker)
         notifications = create_notifications(tickers_with_submissions, get_users_subscribed_to_ticker)
         if len(notifications) > 0:
-            self.kinesis.send_notification_batch(notifications.items())
+            self.sqs.send_notification_batch(list(notifications.items()))
             logger.info(f'Queued {len(notifications)} notifications')
 
     def notify(self, notification, attempts_left=2):

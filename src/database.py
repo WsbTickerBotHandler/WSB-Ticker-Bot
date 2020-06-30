@@ -1,4 +1,5 @@
 import boto3
+from datetime import timedelta, datetime
 from boto3 import Session
 from botocore.exceptions import ProfileNotFound
 
@@ -91,10 +92,12 @@ class Database:
         )
 
     def add_notification_marker(self, notification_id):
+        ttl = (datetime.now() + timedelta(days=5)).timestamp()
         return self.client.put_item(
             TableName=SENT_NOTIFICATIONS_TABLE_NAME,
             Item={
-                'id': {'S': notification_id}
+                'id': {'S': notification_id},
+                'ttl': {'N': str(int(ttl))}
             },
             ReturnValues='NONE'
         )
