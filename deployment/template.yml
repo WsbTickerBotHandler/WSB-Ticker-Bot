@@ -133,7 +133,7 @@ Resources:
         UserNotification:
           Type: Kinesis
           Properties:
-            Stream: !GetAtt NotificationsStream.Arn
+            Stream: !GetAtt NotificationsConsumer.ConsumerARN
             BatchSize: 10
             MaximumBatchingWindowInSeconds: 5
             StartingPosition: LATEST
@@ -167,12 +167,18 @@ Resources:
         UserNotification:
           Type: Kinesis
           Properties:
-            Stream: !GetAtt NotificationsStream.Arn
+            Stream: !GetAtt NotificationsConsumer.ConsumerARN
             BatchSize: 10
             MaximumBatchingWindowInSeconds: 5
             StartingPosition: LATEST
       Tags:
         Version: !Ref Version
+
+  NotificationsConsumer:
+    Type: AWS::Kinesis::StreamConsumer
+      Properties:
+        ConsumerName: NotificationsConsumer
+        StreamARN: !GetAtt NotificationsStream.Arn
 
   NotificationsStream:
     Type: AWS::Kinesis::Stream
