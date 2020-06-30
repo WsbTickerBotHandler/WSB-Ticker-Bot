@@ -4,6 +4,7 @@ from botocore.exceptions import ProfileNotFound
 
 COMMENTED_SUBMISSIONS_TABLE_NAME = 'commented-submissions'
 NOTIFIED_SUBMISSIONS_TABLE_NAME = 'notified-submissions'
+SENT_NOTIFICATIONS_TABLE_NAME = 'sent-notifications'
 
 
 class Database:
@@ -68,11 +69,32 @@ class Database:
         except KeyError:
             return False
 
+    def has_already_notified(self, notification_id: str) -> bool:
+        try:
+            self.client.get_item(
+                TableName=SENT_NOTIFICATIONS_TABLE_NAME,
+                Key={
+                    'id': {'S': notification_id}
+                }
+            )['Item']
+            return True
+        except KeyError:
+            return False
+
     def add_submission_marker(self, table_name, submission_id):
         return self.client.put_item(
             TableName=table_name,
             Item={
                 'submission_id': {'S': submission_id}
+            },
+            ReturnValues='NONE'
+        )
+
+    def add_notification_marker(self, notification_id):
+        return self.client.put_item(
+            TableName=SENT_NOTIFICATIONS_TABLE_NAME,
+            Item={
+                'id': {'S': notification_id}
             },
             ReturnValues='NONE'
         )

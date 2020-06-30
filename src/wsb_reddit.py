@@ -9,13 +9,13 @@ from prawcore.exceptions import ServerError
 
 from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
 from defaults import *
+from kinesis import Kinesis
 from messages import (make_comment_from_tickers, make_pretty_message,
                       reply_to, create_error_notification, create_subscription_notification,
                       create_unsubscription_notification, create_all_subscription_notification,
                       create_all_unsubscription_notification, create_user_not_old_enough)
-from sqs import SQS
 from submission_utils import SubmissionNotification
-from utils import (get_tickers_for_submission, decode_notification_from_sqs, group_submissions_for_tickers, is_account_old_enough,
+from utils import (get_tickers_for_submission, group_submissions_for_tickers, is_account_old_enough,
                    parse_tickers_from_text, create_notifications, should_sleep_for_seconds)
 
 logger = logging.getLogger()
@@ -23,11 +23,11 @@ logger.setLevel(logging.INFO)
 
 
 class WSBReddit:
-    def __init__(self, username, queue_url=None):
+    def __init__(self, username, stream_name=None):
         self.reddit = Reddit(username)
         self.wsb = self.reddit.subreddit(SUBREDDIT)
         self.database = Database()
-        self.sqs = SQS(queue_url)
+        self.kinesis = Kinesis(stream_name)
 
     def process_inbox(self):
         """
@@ -97,32 +97,27 @@ class WSBReddit:
         """
         get_users_subscribed_to_ticker = partial(self.database.get_users_subscribed_to_ticker)
         notifications = create_notifications(tickers_with_submissions, get_users_subscribed_to_ticker)
-        self.sqs.send_notification_batch(notifications.items())
+        self.kinesis.send_notification_batch(notifications.items())
         len(notifications) > 0 and logger.info(f'Queued {len(notifications)} notifications')
 
-    def notify(self, notification_event, attempts_left=2):
-        notification = decode_notification_from_sqs(notification_event['body'])
-        receipt_handle = notification_event['receiptHandle']
-
+    def notify(self, notification, attempts_left=2):
         user_to_notify, notify_about_these_subs = notification
 
         if attempts_left == 0:
-            logger.error(f'Notification of user {user_to_notify} failed and will not retry. Re-adding notification to queue')
-            self.sqs.send_notification(notification)
+            logger.error(f'Notification of user {user_to_notify} failed and will not retry. Batch will be retried')
         else:
             try:
                 self.reddit.redditor(user_to_notify).message(
                     'New DD posted!',
                     make_pretty_message(notify_about_these_subs)
                 )
-                self.sqs.delete_notification(receipt_handle)
                 time.sleep(.6)
             except Exception as e:
                 logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
                 sleep_for = should_sleep_for_seconds(str(e))
                 if sleep_for > 0:
                     time.sleep(sleep_for + 1)
-                    self.notify(notification_event, attempts_left=attempts_left - 1)
+                    self.notify(notification, attempts_left=attempts_left - 1)
 
     def handle_message(self, item: Union[Message, Comment]):
         """

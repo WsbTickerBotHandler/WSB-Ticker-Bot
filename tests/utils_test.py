@@ -1,10 +1,12 @@
 from functools import partial
 
-from defaults import TICKER_EXCLUSIONS
 from fixtures import *
+import pickle
+import base64
 from submission_utils import SubmissionNotification
 from utils import chunks, create_notifications, get_tickers_for_submission, group_submissions_for_tickers, \
-    is_account_old_enough, parse_tickers_from_text, should_sleep_for_seconds, encode_notification_for_sqs, decode_notification_from_sqs
+    is_account_old_enough, parse_tickers_from_text, should_sleep_for_seconds, generate_notification_id, \
+    decode_notification_kinesis
 
 
 def test_chunks():
@@ -143,17 +145,14 @@ def test_sleep_for_time():
     # sleep_for_time(text_minutes)
 
 
-def test_encode_decode():
-    notification = {'SomeUser': [{
-        'subs': [SubmissionNotification(
-            id='gn18pl',
-            link_flair_text=None,
-            permalink='/r/test/comments/gn18pl/check_it_out/',
-            title='Check it out'
-        )],
-        'ticker': '$SPY'
-    }]}
+def test_encode_decode_kinesis(notification, notification_kinesis):
+    string = base64.b64encode(pickle.dumps(notification_kinesis))
+    user, notification = decode_notification_kinesis(string)
+    notification_id = generate_notification_id((user, notification))
+    assert notification_id == "SomeUser-gn18pl"
+    assert user == 'SomeUser'
+    assert notification[0]['ticker'] == "$SPY"
 
-    string = encode_notification_for_sqs(notification)
-    result = decode_notification_from_sqs(string)
-    assert result['SomeUser'][0]['ticker'] == "$SPY"
+
+def test_generate_notification_id(notification_kinesis):
+    assert generate_notification_id(notification_kinesis) == 'SomeUser-gn18pl'

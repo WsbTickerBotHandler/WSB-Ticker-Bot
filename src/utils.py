@@ -1,4 +1,4 @@
-import codecs
+import base64
 import logging
 import pickle
 import re
@@ -79,6 +79,16 @@ def create_notifications(tickers_with_submissions: {str: [SubmissionNotification
     logger.debug(f'Notifications object: {sorted_notifications}')
     len(notified_tickers) > 0 and logger.info(f"Will notify users about a total of {len(notified_tickers)} unique tickers")
     return sorted_notifications
+
+
+def generate_notification_id(notification: tuple) -> str:
+    """
+    Generate a notification id based on the user who is being notified and the first submission id that they're being notified about
+    This assumes that a submission will NEVER be processed twice and therefore never generate another notification for the same user for the same submission
+    """
+    user, submissions = notification
+    submission = submissions[0]['subs'][0].id
+    return f'{user}-{submission}'
 
 
 def get_tickers_for_submission(submission: Submission) -> [str]:
@@ -183,11 +193,6 @@ def should_sleep_for_seconds(text):
         return float(0)
 
 
-# https://stackoverflow.com/questions/30469575/how-to-pickle-and-unpickle-to-portable-string-in-python-3
-def encode_notification_for_sqs(notification) -> str:
-    return codecs.encode(pickle.dumps(notification), "base64").decode()
-
-
-def decode_notification_from_sqs(notification: str):
-    return pickle.loads(codecs.decode(notification.encode(), "base64"))
-
+def decode_notification_kinesis(notification: str) -> tuple:
+    user, notifications = pickle.loads(base64.b64decode(notification))
+    return user, notifications
