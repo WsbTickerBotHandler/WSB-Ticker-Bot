@@ -90,5 +90,5 @@ def make_pretty_message(ticker_notifications: [{}]) -> str:
         pretty_message += f'## {n["ticker"]}:\n{make_title_links(n["subs"])}\n\n'
         tickers += n
     tickers_for_stop_example = random.choices(tickers, k=2) if len(tickers) > 1 else tickers[:1]
-    pretty_message += f'To stop these notifications, reply with the tickers you\'d like to stop like `stop {" ".join(tickers_for_stop_example)}`'
+    pretty_message += f'To stop notifications, reply with the tickers you\'d like to stop like `stop {" ".join(tickers_for_stop_example)}`'
     return pretty_message
