@@ -20,7 +20,7 @@ def reply_to(item: Union[Message, Comment], message: str):
 
 
 def create_subscription_notification(tickers: [str]):
-    tickers_for_stop_example = random.choices(tickers, k=2) if len(tickers) > 1 else tickers[:1]
+    tickers_for_stop_example = random.sample(tickers, k=2) if len(tickers) > 1 else tickers[:1]
     return f'You\'ll be notified when DD is posted for {", ".join(tickers)}\n\n\n\n' + \
            f'To stop subscriptions reply with a message like `stop {" ".join(tickers_for_stop_example)}`'
 
@@ -88,7 +88,7 @@ def make_pretty_message(ticker_notifications: [{}]) -> str:
     tickers = []
     for n in ticker_notifications:
         pretty_message += f'## {n["ticker"]}:\n{make_title_links(n["subs"])}\n\n'
-        tickers += n
-    tickers_for_stop_example = random.choices(tickers, k=2) if len(tickers) > 1 else tickers[:1]
+        tickers.append(n["ticker"])
+    tickers_for_stop_example = random.sample(tickers, k=2) if len(tickers) > 1 else tickers[:1]
     pretty_message += f'To stop notifications, reply with the tickers you\'d like to stop like `stop {" ".join(tickers_for_stop_example)}`'
     return pretty_message
