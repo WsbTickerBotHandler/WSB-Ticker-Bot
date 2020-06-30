@@ -118,7 +118,7 @@ Resources:
         Variables:
           BotUserName: WSBStockTickerBot
           NotificationsQueueUrl: !Ref NotificationsQueue
-      Timeout: 60
+      Timeout: 120
       MemorySize: 256
       ReservedConcurrentExecutions: 1
       # Function's execution role
@@ -150,7 +150,7 @@ Resources:
         Variables:
           BotUserName: WSBTickerBotHandler
           NotificationsQueueUrl: !Ref NotificationsQueue
-      Timeout: 60
+      Timeout: 120
       MemorySize: 256
       ReservedConcurrentExecutions: 1
       # Function's execution role
@@ -173,7 +173,7 @@ Resources:
   NotificationsQueue:
     Type: AWS::SQS::Queue
     Properties:
-      VisibilityTimeout: 61
+      VisibilityTimeout: 121
 
   libs:
     Type: AWS::Serverless::LayerVersion
