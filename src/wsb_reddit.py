@@ -97,8 +97,9 @@ class WSBReddit:
         """
         get_users_subscribed_to_ticker = partial(self.database.get_users_subscribed_to_ticker)
         notifications = create_notifications(tickers_with_submissions, get_users_subscribed_to_ticker)
-        self.kinesis.send_notification_batch(notifications.items())
-        len(notifications) > 0 and logger.info(f'Queued {len(notifications)} notifications')
+        if len(notifications) > 0:
+            self.kinesis.send_notification_batch(notifications.items())
+            logger.info(f'Queued {len(notifications)} notifications')
 
     def notify(self, notification, attempts_left=2):
         user_to_notify, notify_about_these_subs = notification
