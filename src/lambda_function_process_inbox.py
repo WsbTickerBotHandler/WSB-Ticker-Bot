@@ -7,6 +7,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def process_inbox(event, context):
+def run_process_inbox(event, context):
     wsb_reddit = WSBReddit(os.environ['BotUserName'])
     wsb_reddit.process_inbox()

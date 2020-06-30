@@ -8,7 +8,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def run_bot(event, context):
+def run_process_submissions(event, context):
     # Use these keys for configuring the bot at runtime using events (can send test events in lambda)
     try:
         event['submission_limit']
@@ -31,5 +31,4 @@ def run(submission_limit: int, reprocess: bool):
     wsb_reddit = WSBReddit(os.environ['BotUserName'])
     submissions = wsb_reddit.get_submissions(limit=submission_limit, flair_filter=True)
 
-    wsb_reddit.process_inbox()
     wsb_reddit.process_submissions(submissions, reprocess=reprocess)

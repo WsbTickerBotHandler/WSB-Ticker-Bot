@@ -7,7 +7,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def process_notifications(event, context):
+def run_notify(event, context):
     bot_user = os.environ['BotUserName']
     wsb_reddit = WSBReddit(bot_user)
 
