@@ -32,10 +32,11 @@ class SQS:
         for entries_chunk in chunk_list(notifications, 10):
             total.append(encode_notification_for_sqs(entries_chunk))
 
-        self.client.send_message_batch(
-            QueueUrl=self.queue_url,
-            Entries=[self.create_notification_message(e) for e in total]
-        )
+        for chunk_of_total in chunk_list(total, 10):
+            self.client.send_message_batch(
+                QueueUrl=self.queue_url,
+                Entries=[self.create_notification_message(e) for e in chunk_of_total]
+            )
 
     def delete_notification(self, notification_receipt_handle):
         self.client.delete_message(
