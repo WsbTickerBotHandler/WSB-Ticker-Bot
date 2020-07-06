@@ -112,7 +112,7 @@ class WSBReddit:
                     'New DD posted!',
                     make_pretty_message(notify_about_these_subs)
                 )
-                time.sleep(.6)
+                time.sleep(1)
             except Exception as e:
                 logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
                 sleep_for = should_sleep_for_seconds(str(e))
