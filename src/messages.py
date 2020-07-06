@@ -3,10 +3,11 @@ import random
 import urllib.parse
 from typing import Union
 
-from praw.models import Message, Comment, Submission
+from praw.models import Message, Comment
 
 from defaults import DEFAULT_ACCOUNT_AGE
 from stock_data.tickers import tickers as tickers_set
+from utils import reduce_notifications
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -78,17 +79,17 @@ def create_user_not_old_enough() -> str:
 
 
 def make_pretty_message(ticker_notifications: [{}]) -> str:
-    def make_title_links(submissions: [Submission]):
-        title_links = ""
-        for s in submissions:
-            title_links += f'- [{s.title}]({s.permalink})\n'
-        return title_links
-
     pretty_message = ""
-    tickers = []
-    for n in ticker_notifications:
-        pretty_message += f'## {n["ticker"]}:\n{make_title_links(n["subs"])}\n\n'
-        tickers.append(n["ticker"])
-    tickers_for_stop_example = random.sample(tickers, k=2) if len(tickers) > 1 else tickers[:1]
+    tickers = set()
+
+    notifications = reduce_notifications(ticker_notifications)
+
+    for n in notifications:
+        pretty_message += f'## {" ".join(n[1])}:\n- [{n[0].title}]({n[0].permalink})\n\n\n'
+        [tickers.add(t) for t in n[1]]
+
+    tickers_in_this_notification = list(tickers)
+    tickers_for_stop_example = random.sample(tickers_in_this_notification, k=2) if len(tickers_in_this_notification) > 1 else tickers_in_this_notification[:1]
+
     pretty_message += f'To stop notifications, reply with the tickers you\'d like to stop like `stop {" ".join(tickers_for_stop_example)}`'
     return pretty_message

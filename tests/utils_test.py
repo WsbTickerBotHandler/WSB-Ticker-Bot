@@ -1,12 +1,12 @@
+import base64
+import pickle
 from functools import partial
 
 from fixtures import *
-import pickle
-import base64
 from submission_utils import SubmissionNotification
 from utils import chunks, create_notifications, get_tickers_for_submission, group_submissions_for_tickers, \
     is_account_old_enough, parse_tickers_from_text, should_sleep_for_seconds, generate_notification_id, \
-    decode_notification_kinesis, encode_notification_for_sqs, decode_notification_from_sqs
+    decode_notification_kinesis, encode_notification_for_sqs, decode_notification_from_sqs, reduce_notifications
 
 
 def test_chunks():
@@ -90,6 +90,33 @@ def test_group_submissions_for_tickers(a_submission: Submission):
     }
     assert group_submissions_for_tickers([a_submission], partial(mock_had_already_processed_id_false)) == expected_result
     assert group_submissions_for_tickers([a_submission], partial(mock_had_already_processed_id_true)) == {}
+
+
+def test_reduce_notifications():
+    sub1 = SubmissionNotification(id='1', link_flair_text='DD', permalink='test.permalink1', title='test-submission1')
+    sub2 = SubmissionNotification(id='2', link_flair_text='DD', permalink='test.permalink2', title='test-submission1')
+    sub3 = SubmissionNotification(id='3', link_flair_text='DD', permalink='test.permalink3', title='test-submission3')
+    notifications = [
+        {
+            'ticker': '$A',
+            'subs': [sub1]
+        },
+        {
+            'ticker': '$B',
+            'subs': [sub1, sub2],
+        },
+        {
+            'ticker': '$C',
+            'subs': [sub1, sub2, sub3],
+        }
+    ]
+    expected_result = [
+        (SubmissionNotification(id='1', link_flair_text='DD', permalink='test.permalink1', title='test-submission1'), ['$A', '$B', '$C']),
+        (SubmissionNotification(id='2', link_flair_text='DD', permalink='test.permalink2', title='test-submission1'), ['$B', '$C']),
+        (SubmissionNotification(id='3', link_flair_text='DD', permalink='test.permalink3', title='test-submission3'), ['$C'])
+    ]
+
+    assert reduce_notifications(notifications) == expected_result
 
 
 @pytest.mark.integration

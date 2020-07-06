@@ -174,6 +174,27 @@ def parse_tickers_from_text(text) -> [str]:
     return list(sorted(set(['$' + ticker if ticker[0] != '$' else ticker for ticker in stripped_punct_tickers if ticker.strip('$') in tickers_set])))
 
 
+def reduce_notifications(ticker_notifications: [{}]) -> [()]:
+    """
+    Some tickers are mentioned in multiple posts, group the posts so that many links aren't sent
+    """
+    submissions = {}
+    result = {}
+    for n in ticker_notifications:
+        ticker = n['ticker']
+        subs = n['subs']
+        for s in subs:
+            if s.id in result:
+                result[s.id].append(ticker)
+            else:
+                result[s.id] = [ticker]
+                submissions[s.id] = s
+
+    result_tuples = [(k, v) for k, v in result.items()]
+
+    return [(submissions[t[0]], t[1]) for t in result_tuples]
+
+
 def should_sleep_for_seconds(text):
     find_seconds = r'try again in (\d+) seconds?'
     find_minutes = r'try again in (\d+) minutes?'
