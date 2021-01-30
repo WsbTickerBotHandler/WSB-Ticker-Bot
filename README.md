@@ -6,10 +6,11 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
 **[/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) scans [/r/wsb](https://www.reddit.com/r/wallstreetbets/ "WSB")'s new posts and will notify you when DD is being posted about tickers you're interested in**
 
 ## How to use
-~~**EASY>>** [CLICK HERE TO SUBSCRIBE TO A TICKER(S)!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=Type%20tickers%20%24LIKE%20%24THIS%20anywhere%20in%20this%20message%20to%20subscribe%20to%20them) **<<EASY**~~
-Looks like there's too many of us and the bot is getting rate limited. While I search for a workaround (if one exists), please subscribe to tickers individually below
+**EASY>>** [CLICK HERE TO SUBSCRIBE TO A TICKER(S)!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=Type%20tickers%20%24LIKE%20%24THIS%20anywhere%20in%20this%20message%20to%20subscribe%20to%20them) **<<EASY**
 
-**EASY>>** [CLICK HERE TO SUBSCRIBE TO ALL NEW DD!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=ALL%20DD) **<<EASY**
+
+~~**EASY>>** [CLICK HERE TO SUBSCRIBE TO ALL NEW DD!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=ALL%20DD) **<<EASY**~~
+**Looks like there's too many of us and the bot is getting rate limited. While I search for a workaround (if one exists), please subscribe to tickers individually below**
 
 Or...
 
