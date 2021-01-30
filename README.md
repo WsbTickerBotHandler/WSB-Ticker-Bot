@@ -6,7 +6,8 @@ I'll set the scene for you. It's 1:03pm on a Friday. You've just worked hard to 
 **[/u/WSBStockTickerBot](https://www.reddit.com/user/WSBStockTickerBot) scans [/r/wsb](https://www.reddit.com/r/wallstreetbets/ "WSB")'s new posts and will notify you when DD is being posted about tickers you're interested in**
 
 ## How to use
-**EASY>>** [CLICK HERE TO SUBSCRIBE TO A TICKER(S)!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=Type%20tickers%20%24LIKE%20%24THIS%20anywhere%20in%20this%20message%20to%20subscribe%20to%20them) **<<EASY**
+~~**EASY>>** [CLICK HERE TO SUBSCRIBE TO A TICKER(S)!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=Type%20tickers%20%24LIKE%20%24THIS%20anywhere%20in%20this%20message%20to%20subscribe%20to%20them) **<<EASY**~~
+Looks like there's too many of us and the bot is getting rate limited. While I search for a workaround (if one exists), please subscribe to tickers individually below
 
 **EASY>>** [CLICK HERE TO SUBSCRIBE TO ALL NEW DD!](https://np.reddit.com/message/compose/?to=WSBStockTickerBot&subject=Subscribe%20Me&message=ALL%20DD) **<<EASY**
 
@@ -16,11 +17,11 @@ Or...
   * Example: `$ESGV $UCO $GE` will subscribe you to the `$ESGV`, `$UCO` and `$GE` tickers
 * Use a message with stop at the beginning to be unsubscribed from specific tickers
   * Example: `STOP $UCO $GE`
-* Use `STOP ALL` to unsubscribe from the "ALL DD" feed
+~~* Use `STOP ALL` to unsubscribe from the "ALL DD" feed~~ DISABLED, see above
 
 ## A couple things to know
 * If you subscribed to an individual ticker you'll be notified of new posts with the `DD` flair for that ticker
-* If you subscribed to the "ALL DD" feed, you'll be notified of all new `DD` flaired posts 
+~~* If you subscribed to the "ALL DD" feed, you'll be notified of all new `DD` flaired posts~~
 * Stopping your "ALL DD" subscription will not stop individual tickers you've subscribed to separately
 
 * If you find any issues or have a suggestion or feature you'd like to see, send a message to [/u/WSBTickerBotHandler](https://www.reddit.com/user/WSBTickerBotHandler) or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
