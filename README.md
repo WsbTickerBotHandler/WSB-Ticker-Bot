@@ -18,11 +18,11 @@ Or...
   * Example: `$ESGV $UCO $GE` will subscribe you to the `$ESGV`, `$UCO` and `$GE` tickers
 * Use a message with stop at the beginning to be unsubscribed from specific tickers
   * Example: `STOP $UCO $GE`
-~~* Use `STOP ALL` to unsubscribe from the "ALL DD" feed~~ DISABLED, see above
+  * ~~Use `STOP ALL` to unsubscribe from the "ALL DD" feed~~ DISABLED, see above
 
 ## A couple things to know
 * If you subscribed to an individual ticker you'll be notified of new posts with the `DD` flair for that ticker
-~~* If you subscribed to the "ALL DD" feed, you'll be notified of all new `DD` flaired posts~~
+* ~~If you subscribed to the "ALL DD" feed, you'll be notified of all new `DD` flaired posts~~
 * Stopping your "ALL DD" subscription will not stop individual tickers you've subscribed to separately
 
 * If you find any issues or have a suggestion or feature you'd like to see, send a message to [/u/WSBTickerBotHandler](https://www.reddit.com/user/WSBTickerBotHandler) or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
