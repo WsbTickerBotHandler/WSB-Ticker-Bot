@@ -22,7 +22,7 @@ Or...
 
 ## A couple things to know
 * If you subscribed to an individual ticker you'll be notified of new posts with the `DD` flair for that ticker
-* ~~If you subscribed to the "ALL DD" feed, you'll be notified of all new `DD` flaired posts~~
+* ~~If you subscribed to the "ALL DD" feed, you'll be notified of all new `DD` flaired posts~~ DISABLED, see above
 * Stopping your "ALL DD" subscription will not stop individual tickers you've subscribed to separately
 
 * If you find any issues or have a suggestion or feature you'd like to see, send a message to [/u/WSBTickerBotHandler](https://www.reddit.com/user/WSBTickerBotHandler) or open an issue/PR here https://github.com/WsbTickerBotHandler/WSB-Ticker-Bot
