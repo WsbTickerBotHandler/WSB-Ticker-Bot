@@ -24,7 +24,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
         - AmazonDynamoDBFullAccess
         - AmazonSQSFullAccess
       Layers:
@@ -58,7 +58,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
         - AmazonDynamoDBFullAccess
       Layers:
         - !Ref libs
@@ -91,7 +91,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
         - AmazonDynamoDBFullAccess
       Layers:
         - !Ref libs
@@ -124,7 +124,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
         - AmazonDynamoDBFullAccess
         - AmazonSQSFullAccess
       Layers:
@@ -156,7 +156,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
         - AmazonDynamoDBFullAccess
         - AmazonSQSFullAccess
       Layers:

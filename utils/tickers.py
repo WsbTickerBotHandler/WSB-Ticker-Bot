@@ -2,11 +2,11 @@ import os
 import wget
 import pickle
 import time
-from database import Database
+# from database import Database
 
 nasdaq_tickers_file_name = 'nasdaqlisted.txt'
 other_tickers_file_name = 'otherlisted.txt'
-combined_file_name = f'{os.path.dirname(__file__)}/combined.pkl'
+combined_file_name = f'{os.path.dirname(os.path.realpath(__file__))}/combined.pkl'
 
 main_tickers_ftp = 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt'
 other_tickers_ftp = 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt'
@@ -70,5 +70,5 @@ def create_batch_request_items(symbol: str):
 
 
 if __name__ == '__main__':
-    # download_tickers()
+    download_tickers()
     process_tickers()

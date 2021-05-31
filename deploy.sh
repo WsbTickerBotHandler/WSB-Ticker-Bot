@@ -1,7 +1,7 @@
 #!/bin/bash
 pipenv lock -r > requirements.txt
 mkdir -p package/python
-pip install --target deployment/package/python -r requirements.txt --upgrade && \
+pip3 install --target deployment/package/python -r requirements.txt --upgrade && \
 ARTIFACT_BUCKET=$(cat bucket-name.txt) && \
 aws cloudformation package \
   --template-file deployment/template.yml \

@@ -39,6 +39,12 @@ If you lost money because you read some shit DD then open up the door to the bac
 
 ## Development
 Setting up the environment
+* Install system dependencies
+```shell
+apt-get install python3
+apt-get install python3-pip
+apt-get install awscli
+```
 * Create a `praw.ini` file in the root directory of this project with the Reddit bot's account information
 ```
 [WSBStockTickerBot]
@@ -56,12 +62,18 @@ region = us-west-1
 aws_access_key_id=<access-key-id>
 aws_secret_access_key=<secret-acccess-key>
 ```
-* Run the credentials configuration script `make configure_credentials`
+* Run the credential configuration script `make configure_credentials`
 * General information
     * All commands should be run through the `makefile` and executed at the top-level directory
-    * The bot is deployed on lambda and runs every 5 minutes. To deploy, you first have to have an S3 bucket to store the bot's libs. Run `make create_bucket` followed by `make deploy` to do it all
+    * The bot is deployed on Lambda and runs every 5 minutes. To deploy, you first have to have an S3 bucket to store the bot's libs. Run `make create_bucket` followed by `make deploy` to do it all
     * A DynamoDB is configured (not set up automatically here) with some tables to track things like whether a particular submission has already been processed by the bot and which users are subscribed to which tickers. You'll fine function in `database.py` accessed throughout the app for these purposes
     * The `utils` folder contains tools for updating the `stock_data` package with an updated list of all valid tickers
     * The top-level function is located in `lambda.py`
     * Top-level operational functions such as `process_inbox` are not tested. All non-externally dependent functions should be unit tested. Most externally dependent functions should be integration tested (tagged with `@pytest.mark.integration` and use a fixture to perform a test with real data)
     
+### Updating the tickers file
+```shell
+pipenv install --dev
+pipenv shell
+cd utils && python tickers.py
+```
