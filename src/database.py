@@ -6,6 +6,8 @@ from botocore.exceptions import ProfileNotFound
 COMMENTED_SUBMISSIONS_TABLE_NAME = 'commented-submissions'
 NOTIFIED_SUBMISSIONS_TABLE_NAME = 'notified-submissions'
 SENT_NOTIFICATIONS_TABLE_NAME = 'sent-notifications'
+# Users who have blocked the bot, do not attemp to send
+BLOCKED_USERS_TABLE_NAME = 'blocked-users'
 
 
 class Database:
@@ -58,12 +60,24 @@ class Database:
         except KeyError:
             return []
 
-    def has_already_processed(self, submission_id, table_name, ) -> bool:
+    def has_already_processed(self, submission_id, table_name) -> bool:
         try:
             self.client.get_item(
                 TableName=table_name,
                 Key={
                     'submission_id': {'S': submission_id}
+                }
+            )['Item']
+            return True
+        except KeyError:
+            return False
+
+    def user_has_blocked_bot(self, user_id, table_name) -> bool:
+        try:
+            self.client.get_item(
+                TableName=table_name,
+                Key={
+                    'user_id': {'S': user_id}
                 }
             )['Item']
             return True
@@ -98,6 +112,15 @@ class Database:
             Item={
                 'id': {'S': notification_id},
                 'ttl': {'N': str(int(ttl))}
+            },
+            ReturnValues='NONE'
+        )
+
+    def add_blocked_user(self, user_id):
+        return self.client.put_item(
+            TableName=BLOCKED_USERS_TABLE_NAME,
+            Item={
+                'id': {'S': user_id}
             },
             ReturnValues='NONE'
         )

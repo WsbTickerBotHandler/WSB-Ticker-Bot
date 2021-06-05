@@ -7,7 +7,7 @@ from praw.models import Message, Comment, Submission, Redditor
 from praw.reddit import Reddit
 from prawcore.exceptions import ServerError
 
-from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
+from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME, BLOCKED_USERS_TABLE_NAME
 from defaults import *
 from sqs import SQS
 from messages import (make_comment_from_tickers, make_pretty_message,
@@ -106,19 +106,31 @@ class WSBReddit:
 
         if attempts_left == 0:
             logger.error(f'Notification of user {user_to_notify} failed and will not retry. Batch will be retried')
+            exit(1)
         else:
-            try:
-                self.reddit.redditor(user_to_notify).message(
-                    'New DD posted!',
-                    make_pretty_message(notify_about_these_subs)
-                )
-                time.sleep(1)
-            except Exception as e:
-                logger.error(f'Notification of user {user_to_notify} ran into an error: {e}')
-                sleep_for = should_sleep_for_seconds(str(e))
-                if sleep_for > 0:
-                    time.sleep(sleep_for + 1)
-                    self.notify(notification, attempts_left=attempts_left - 1)
+            user_has_blocked_bot = self.database.user_has_blocked_bot(user_to_notify, table_name=BLOCKED_USERS_TABLE_NAME)
+            if not user_has_blocked_bot:
+                try:
+                    self.reddit.redditor(user_to_notify).message(
+                        'New DD posted!',
+                        make_pretty_message(notify_about_these_subs)
+                    )
+                    time.sleep(1)
+                except Exception as e:
+                    sleep_for = should_sleep_for_seconds(str(e))
+                    if sleep_for > 0:
+                        logger.error(
+                            f'Notification of user {user_to_notify} ran into a retryable error. ' +
+                            f'Sleeping for {sleep_for} seconds. Error was: {e}'
+                        )
+                        time.sleep(sleep_for + 1)
+                        self.notify(notification, attempts_left=attempts_left - 1)
+                    else:
+                        if 'NOT_WHITELISTED_BY_USER' in str(e):
+                            self.database.add_blocked_user(user_to_notify)
+                        logger.error(f'Notification of user ${user_to_notify} ran into a fatal error: {e}')
+            else:
+                logger.debug(f'User {user_to_notify} has blocked the bot, not notifying')
 
     def handle_message(self, item: Union[Message, Comment]):
         """

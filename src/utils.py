@@ -204,11 +204,9 @@ def should_sleep_for_seconds(text):
 
     if time_seconds is not None:
         sleep_time = time_seconds.group(1)
-        logger.info(f"Sleeping for {sleep_time} seconds")
         return float(sleep_time)
     elif time_minutes is not None:
         sleep_time = time_minutes.group(1)
-        logger.info(f"Sleeping for {sleep_time} minutes")
         return float(sleep_time) * 60
     else:
         return float(0)
