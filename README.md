@@ -71,9 +71,8 @@ aws_secret_access_key=<secret-acccess-key>
     * The top-level function is located in `lambda.py`
     * Top-level operational functions such as `process_inbox` are not tested. All non-externally dependent functions should be unit tested. Most externally dependent functions should be integration tested (tagged with `@pytest.mark.integration` and use a fixture to perform a test with real data)
     
-### Updating the tickers file
+### Updating the tickers file for new IPOs and newly listed companies
 ```shell
-pipenv install --dev
-pipenv shell
-cd utils && python tickers.py
+make update_tickers
+# Be sure to redeploy the bot afterwards
 ```
