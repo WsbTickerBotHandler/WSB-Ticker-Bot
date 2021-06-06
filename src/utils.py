@@ -196,8 +196,8 @@ def reduce_notifications(ticker_notifications: [{}]) -> [()]:
 
 
 def should_sleep_for_seconds(text):
-    find_seconds = r'try again in (\d+) seconds?'
-    find_minutes = r'try again in (\d+) minutes?'
+    find_seconds = r'for (\d+) seconds?'
+    find_minutes = r'for (\d+) minutes?'
 
     time_seconds = re.search(find_seconds, text)
     time_minutes = re.search(find_minutes, text)

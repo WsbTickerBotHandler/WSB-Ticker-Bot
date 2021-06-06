@@ -105,7 +105,7 @@ class WSBReddit:
         user_to_notify, notify_about_these_subs = notification
 
         if attempts_left == 0:
-            logger.error(f'Notification of user {user_to_notify} failed and will not retry. Batch will be retried')
+            logger.error(f'Notification of user {user_to_notify} timed out and will not retry. Batch will be retried')
             exit(1)
         else:
             user_has_blocked_bot = self.database.user_has_blocked_bot(user_to_notify, table_name=BLOCKED_USERS_TABLE_NAME)
@@ -128,7 +128,8 @@ class WSBReddit:
                     else:
                         if 'NOT_WHITELISTED_BY_USER' in str(e):
                             self.database.add_blocked_user(user_to_notify)
-                        logger.error(f'Notification of user ${user_to_notify} ran into a fatal error: {e}')
+                        else:
+                            logger.error(f'Notification of user {user_to_notify} ran into a fatal error: {e}')
             else:
                 logger.debug(f'User {user_to_notify} has blocked the bot, not notifying')
 

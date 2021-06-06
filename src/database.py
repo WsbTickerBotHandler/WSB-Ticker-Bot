@@ -120,7 +120,7 @@ class Database:
         return self.client.put_item(
             TableName=BLOCKED_USERS_TABLE_NAME,
             Item={
-                'id': {'S': user_id}
+                'user_id': {'S': user_id}
             },
             ReturnValues='NONE'
         )
