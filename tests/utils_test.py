@@ -6,7 +6,8 @@ from fixtures import *
 from submission_utils import SubmissionNotification
 from utils import chunks, create_notifications, get_tickers_for_submission, group_submissions_for_tickers, \
     is_account_old_enough, parse_tickers_from_text, should_sleep_for_seconds, generate_notification_id, \
-    decode_notification_kinesis, encode_notification_for_sqs, decode_notification_from_sqs, reduce_notifications
+    decode_notification_kinesis, encode_notification_for_sqs, decode_notification_from_sqs, reduce_notifications, \
+    should_block_based_on_message
 
 
 def test_chunks():
@@ -124,6 +125,16 @@ def test_is_account_old_enough(a_user: Redditor):
     assert is_account_old_enough(a_user) is True
 
 
+def test_should_block_based_on_message():
+    errors = {
+        "Notification of user SlimyMango ran into a fatal error: " +
+        "INVALID_USER: 'That user is invalid' on field 'to'",
+        "Notification of user 2longdingdong ran into a fatal error: " +
+        "USER_DOESNT_EXIST: \"that user doesn't exist\" on field 'to'"
+    }
+    assert any(should_block_based_on_message(m) for m in errors)
+
+
 text = f'''
         $Rip airlines
         VEM is going to moon
@@ -133,7 +144,7 @@ text = f'''
         $FIVES five letter tickers with dollar sign
         $R should be matched but T shouldn't be
         $BRK.A and $BRMK.W should be matched
-        BRK.B and BIOX.W should be matched
+        BRK.B should be matched
         $BF.A should be matched
         TLDR: should be excluded
         ($LULU.) should be included
@@ -158,7 +169,7 @@ text = f'''
 
 
 def test_parse_tickers_from_text():
-    expected_out = ['$AAAU', '$AADR', '$ATH', '$MGM', '$CZR', '$BF.A', '$BIOX.W', '$BRK.A', '$BRK.B', '$BRMK.W', '$DIS', '$GAIN', '$LULU', '$R', '$SPXL',
+    expected_out = ['$AAAU', '$AADR', '$ATH', '$MGM', '$CZR', '$BF.A', '$BRK.A', '$BRK.B', '$BRMK.W', '$DIS', '$GAIN', '$LULU', '$R', '$SPXL',
                     '$SPY', '$VTIQ', '$Z']
     assert parse_tickers_from_text(text) == sorted(expected_out)
 

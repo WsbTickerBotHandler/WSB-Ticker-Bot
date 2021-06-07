@@ -16,7 +16,7 @@ from messages import (make_comment_from_tickers, make_pretty_message,
                       create_all_unsubscription_notification, create_user_not_old_enough)
 from submission_utils import SubmissionNotification
 from utils import (get_tickers_for_submission, group_submissions_for_tickers, is_account_old_enough,
-                   parse_tickers_from_text, create_notifications, should_sleep_for_seconds)
+                   parse_tickers_from_text, create_notifications, should_sleep_for_seconds, should_block_based_on_message)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -108,7 +108,7 @@ class WSBReddit:
             logger.error(f'Notification of user {user_to_notify} timed out and will not retry. Batch will be retried')
             exit(1)
         else:
-            user_has_blocked_bot = self.database.user_has_blocked_bot(user_to_notify, table_name=BLOCKED_USERS_TABLE_NAME)
+            user_has_blocked_bot = self.database.is_user_blocked(user_to_notify, table_name=BLOCKED_USERS_TABLE_NAME)
             if not user_has_blocked_bot:
                 try:
                     self.reddit.redditor(user_to_notify).message(
@@ -126,12 +126,13 @@ class WSBReddit:
                         time.sleep(sleep_for + 1)
                         self.notify(notification, attempts_left=attempts_left - 1)
                     else:
-                        if 'NOT_WHITELISTED_BY_USER' in str(e):
+                        if should_block_based_on_message(str(e)):
+                            logger.info(f'Adding user {user_to_notify} to blocklist based on message: {str(e)}')
                             self.database.add_blocked_user(user_to_notify)
                         else:
                             logger.error(f'Notification of user {user_to_notify} ran into a fatal error: {e}')
             else:
-                logger.debug(f'User {user_to_notify} has blocked the bot, not notifying')
+                logger.debug(f'User {user_to_notify} is on the blocked list, not notifying')
 
     def handle_message(self, item: Union[Message, Comment]):
         """

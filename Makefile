@@ -9,9 +9,9 @@ update_tickers:
 	mv utils/combined.pkl src/stock_data/combined.pkl
 	rm utils/*.txt
 test:
-	PYTHONPATH=src AWS_SHARED_CREDENTIALS_FILE=aws-credentials.ini pipenv run py.test tests -m "not integration"
+	PYTHONPATH=src AWS_SHARED_CREDENTIALS_FILE=aws-credentials.ini pipenv run py.test tests -m "not integration" -vv
 integration_test:
-	PYTHONPATH=src AWS_SHARED_CREDENTIALS_FILE=aws-credentials.ini pipenv run py.test tests -m integration
+	PYTHONPATH=src AWS_SHARED_CREDENTIALS_FILE=aws-credentials.ini pipenv run py.test tests -m integration -vv
 deploy:
 	AWS_PROFILE=wsb-ticker-bot AWS_CONFIG_FILE=aws-credentials.ini sh make_bucket.sh
 	AWS_PROFILE=wsb-ticker-bot AWS_CONFIG_FILE=aws-credentials.ini sh deploy.sh

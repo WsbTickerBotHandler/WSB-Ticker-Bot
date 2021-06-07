@@ -144,6 +144,15 @@ def is_account_old_enough(account: Redditor, days: int = DEFAULT_ACCOUNT_AGE) ->
     return now - created_at > timedelta(days=days)
 
 
+def should_block_based_on_message(message: str) -> bool:
+    """
+    :return: true if the given message indicates that we should blocked a user from future
+             notification attempts
+    """
+    block_if_contains = {'NOT_WHITELISTED_BY_USER', 'INVALID_USER', 'USER_DOESNT_EXIST'}
+    return any(block in message for block in block_if_contains)
+
+
 def parse_tickers_from_text(text) -> [str]:
     """
     :return: all tickers found in the text string

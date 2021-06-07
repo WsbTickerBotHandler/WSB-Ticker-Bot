@@ -72,7 +72,7 @@ class Database:
         except KeyError:
             return False
 
-    def user_has_blocked_bot(self, user_id, table_name) -> bool:
+    def is_user_blocked(self, user_id, table_name) -> bool:
         try:
             self.client.get_item(
                 TableName=table_name,
