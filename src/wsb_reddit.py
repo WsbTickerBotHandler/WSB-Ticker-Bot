@@ -7,7 +7,7 @@ from praw.models import Message, Comment, Submission, Redditor
 from praw.reddit import Reddit
 from prawcore.exceptions import ServerError
 
-from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME, BLOCKED_USERS_TABLE_NAME
+from database import Database, NOTIFIED_SUBMISSIONS_TABLE_NAME, COMMENTED_SUBMISSIONS_TABLE_NAME
 from defaults import *
 from sqs import SQS
 from messages import (make_comment_from_tickers, make_pretty_message,
@@ -108,7 +108,7 @@ class WSBReddit:
             logger.error(f'Notification of user {user_to_notify} timed out and will not retry. Batch will be retried')
             exit(1)
         else:
-            user_has_blocked_bot = self.database.is_user_blocked(user_to_notify, table_name=BLOCKED_USERS_TABLE_NAME)
+            user_has_blocked_bot = self.database.is_user_blocked(user_to_notify)
             if not user_has_blocked_bot:
                 try:
                     self.reddit.redditor(user_to_notify).message(
@@ -149,7 +149,12 @@ class WSBReddit:
 
         is_old_enough = is_account_old_enough(author)
 
-        if len(tickers) > MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE and is_old_enough:
+        if body.lower() == "unblock me":
+            self.database.unblock_user(author.name)
+            reply_to(item, f'You\'ve been unblocked and can now use the bot like normal. Make sure you have private messaging enabled or you\'ll be blocked again')
+        elif self.database.is_user_blocked(author.name):
+            reply_to(item, f'I\'ve blocked you for some reason. Reply with "unblock me" to be unblocked')
+        elif len(tickers) > MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE and is_old_enough:
             logger.info(f'User {author} requested subscription to more than {MAX_TICKERS_TO_SUBSCRIBE_AT_ONCE} tickers')
             reply_to(item, "You can only subscribe to 10 tickers at once")
         elif body.lower() == "all dd" and is_old_enough:

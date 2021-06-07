@@ -72,10 +72,10 @@ class Database:
         except KeyError:
             return False
 
-    def is_user_blocked(self, user_id, table_name) -> bool:
+    def is_user_blocked(self, user_id) -> bool:
         try:
             self.client.get_item(
-                TableName=table_name,
+                TableName=BLOCKED_USERS_TABLE_NAME,
                 Key={
                     'user_id': {'S': user_id}
                 }
@@ -120,6 +120,15 @@ class Database:
         return self.client.put_item(
             TableName=BLOCKED_USERS_TABLE_NAME,
             Item={
+                'user_id': {'S': user_id}
+            },
+            ReturnValues='NONE'
+        )
+
+    def unblock_user(self, user_id):
+        self.client.delete_item(
+            TableName=BLOCKED_USERS_TABLE_NAME,
+            Key={
                 'user_id': {'S': user_id}
             },
             ReturnValues='NONE'
